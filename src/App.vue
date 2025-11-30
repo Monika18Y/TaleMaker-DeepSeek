@@ -1,5 +1,5 @@
 <script setup>
-import StoryForge from './components/StoryForge.vue'
+import StoryForge from './components/TaleMaker.vue'
 </script>
 
 <template>
