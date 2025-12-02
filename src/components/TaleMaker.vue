@@ -11,11 +11,13 @@
           <span class="progress-text">已阅读 {{ Math.round(scrollProgress) }}%</span>
         </div>
       </div>
-      
+
       <div class="modal-content" @scroll="onModalScroll">
         <div class="agreement-content">
           <div class="important-note">
-            <p><strong>重要提示：</strong>在访问或使用本网站（以下简称"本站"或"工具"）提供的服务前，请您务必仔细阅读并充分理解本协议各项内容。一旦您开始使用本服务，即表示您已完全同意并接受本协议的所有条款。如果您不同意本协议的任何内容，请立即停止使用本服务。</p>
+            <p>
+              <strong>重要提示：</strong>在访问或使用本网站（以下简称"本站"或"工具"）提供的服务前，请您务必仔细阅读并充分理解本协议各项内容。一旦您开始使用本服务，即表示您已完全同意并接受本协议的所有条款。如果您不同意本协议的任何内容，请立即停止使用本服务。
+            </p>
           </div>
 
           <section class="agreement-section">
@@ -27,8 +29,10 @@
 
           <section class="agreement-section">
             <h3>二、 用户义务与行为规范</h3>
-            <p><strong>2.1 API密钥责任：</strong>您确认并保证，您在本站使用的所有API密钥均为您本人合法获取，并已遵守相关API提供商的服务条款。您独自承担因您的API密钥使用（包括但不限于泄露、盗用、超额消费等）引发的一切后果。</p>
-            
+            <p><strong>2.1
+                API密钥责任：</strong>您确认并保证，您在本站使用的所有API密钥均为您本人合法获取，并已遵守相关API提供商的服务条款。您独自承担因您的API密钥使用（包括但不限于泄露、盗用、超额消费等）引发的一切后果。
+            </p>
+
             <p><strong>2.2 内容合法性：</strong>您承诺使用本服务生成的所有内容必须遵守您所在国家/地区以及服务涉及国家/地区的所有适用法律法规。您严格禁止使用本服务生成以下内容，包括但不限于：</p>
             <ul class="prohibited-list">
               <li><strong>危害国家安全：</strong>煽动分裂国家、破坏国家统一、泄露国家秘密、颠覆国家政权、推翻社会主义制度的内容。</li>
@@ -38,13 +42,17 @@
               <li><strong>侮辱诽谤：</strong>侮辱或者诽谤他人，侵害他人名誉、隐私、肖像权等合法权益的内容。</li>
               <li><strong>其他违法信息：</strong>法律、行政法规禁止的其他任何内容。</li>
             </ul>
-            
-            <p><strong>2.3 禁止规避审查：</strong>您明确承诺，不得以任何形式利用本工具旨在规避或破坏任何第三方AI服务提供商内置的内容安全策略、审查机制或使用限制。您理解，任何此类行为均直接违反了相关API提供商的服务条款，可能导致您的API密钥被永久封禁，且您需自行承担由此产生的一切责任。</p>
+
+            <p><strong>2.3
+                禁止规避审查：</strong>您明确承诺，不得以任何形式利用本工具旨在规避或破坏任何第三方AI服务提供商内置的内容安全策略、审查机制或使用限制。您理解，任何此类行为均直接违反了相关API提供商的服务条款，可能导致您的API密钥被永久封禁，且您需自行承担由此产生的一切责任。
+            </p>
           </section>
 
           <section class="agreement-section">
             <h3>三、 免责声明</h3>
-            <p><strong>3.1 内容责任豁免：</strong>由于本站不参与、不控制、不干预具体的文本生成过程，且不存储任何生成内容，因此本站对用户生成的任何内容的合法性、准确性、完整性、适用性及产生的任何直接或间接后果，不承担任何法律责任。所有由生成内容引发的一切争议、法律责任均由用户本人独立承担。</p>
+            <p><strong>3.1
+                内容责任豁免：</strong>由于本站不参与、不控制、不干预具体的文本生成过程，且不存储任何生成内容，因此本站对用户生成的任何内容的合法性、准确性、完整性、适用性及产生的任何直接或间接后果，不承担任何法律责任。所有由生成内容引发的一切争议、法律责任均由用户本人独立承担。
+            </p>
             <p><strong>3.2 服务稳定性：</strong>本站尽力为您提供稳定的技术服务，但对于服务的中断、终止或出现的缺陷，本站不承担责任。技术服务依赖于第三方API，其稳定性与可用性不在本站控制范围内。</p>
             <p><strong>3.3 间接损失：</strong>在任何情况下，本站均不对任何间接性、后果性、惩罚性、偶然性的损害（包括但不限于利润损失、数据丢失、业务中断等）承担责任。</p>
           </section>
@@ -58,7 +66,8 @@
           <section class="agreement-section">
             <h3>五、 其他</h3>
             <p><strong>5.1</strong> 本站保留随时修改本协议条款的权利。修改后的协议将在本站公布后立即生效。您继续使用本服务即视为接受修改后的协议。</p>
-            <p><strong>5.2</strong> 本协议的订立、执行和解释及争议的解决均应适用中华人民共和国法律。如双方就本协议内容或其执行发生任何争议，应首先友好协商解决；协商不成时，双方同意将争议提交至本站运营方所在地有管辖权的人民法院诉讼解决。</p>
+            <p><strong>5.2</strong>
+              本协议的订立、执行和解释及争议的解决均应适用中华人民共和国法律。如双方就本协议内容或其执行发生任何争议，应首先友好协商解决；协商不成时，双方同意将争议提交至本站运营方所在地有管辖权的人民法院诉讼解决。</p>
           </section>
 
           <div class="agreement-footer">
@@ -67,7 +76,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="modal-footer">
         <div class="footer-note">
           <p><strong>注意：</strong>请完整阅读并理解以上所有条款内容。滚动到底部后"同意并继续"按钮将可用。</p>
@@ -79,11 +88,8 @@
           <button @click="rejectAgreement" class="btn-reject">
             拒绝并离开
           </button>
-          <button 
-            @click="acceptAgreement" 
-            :disabled="isScrollingModal"
-            :class="{ 'btn-agree': true, 'disabled': isScrollingModal }"
-          >
+          <button @click="acceptAgreement" :disabled="isScrollingModal"
+            :class="{ 'btn-agree': true, 'disabled': isScrollingModal }">
             {{ isScrollingModal ? '请阅读完整内容' : '✅ 同意并继续使用' }}
           </button>
         </div>
@@ -110,13 +116,8 @@
             <div class="input-group">
               <label for="apiKey">DeepSeek API Key:</label>
               <div class="input-with-button">
-                <input 
-                  id="apiKey"
-                  v-model="apiKey" 
-                  :type="showApiKey ? 'text' : 'password'" 
-                  placeholder="请输入您的key"
-                  class="input-field"
-                />
+                <input id="apiKey" v-model="apiKey" :type="showApiKey ? 'text' : 'password'" placeholder="请输入您的key"
+                  class="input-field" />
                 <button @click="toggleApiKeyVisibility" class="btn-secondary">
                   {{ showApiKey ? '隐藏' : '显示' }}
                 </button>
@@ -125,7 +126,7 @@
                 </button>
               </div>
             </div>
-            
+
             <!-- 新增：模型配置 -->
             <div class="input-group">
               <label for="model">模型选择:</label>
@@ -134,17 +135,12 @@
                 <option value="deepseek-chat">DeepSeek Chat (常规版)</option>
               </select>
             </div>
-            
+
             <!-- 新增：思维链开关 -->
             <div class="input-group">
               <div class="checkbox-group">
-                <input 
-                  id="enableReasoning"
-                  v-model="enableReasoning" 
-                  type="checkbox"
-                  class="checkbox-input"
-                  :disabled="model !== 'deepseek-reasoner'"
-                />
+                <input id="enableReasoning" v-model="enableReasoning" type="checkbox" class="checkbox-input"
+                  :disabled="model !== 'deepseek-reasoner'" />
                 <label for="enableReasoning" class="checkbox-label">
                   启用思维链 (展示模型思考过程)
                   <br></br>
@@ -154,7 +150,7 @@
                 </label>
               </div>
             </div>
-            
+
             <!-- 新增：思维链显示选项 -->
             <div v-if="enableReasoning && model === 'deepseek-reasoner'" class="input-group">
               <label for="reasoningDisplay">思维链显示方式:</label>
@@ -181,24 +177,14 @@
 
             <div class="input-group">
               <label for="worldView">世界观设定:</label>
-              <textarea 
-                id="worldView"
-                v-model="worldView" 
-                @input="autoResize($event, 60, 400)"
-                placeholder="架空/现实/修仙 可详细设定"
-                class="textarea-field auto-resize"
-              ></textarea>
+              <textarea id="worldView" v-model="worldView" @input="autoResize($event, 60, 400)"
+                placeholder="架空/现实/修仙 可详细设定" class="textarea-field auto-resize"></textarea>
             </div>
-            
+
             <div class="input-group">
               <label for="additionalInfo">其他信息:</label>
-              <textarea 
-                id="additionalInfo"
-                v-model="additionalInfo" 
-                @input="autoResize($event, 60, 400)"
-                placeholder="语言风格/特殊用词等其他要求"
-                class="textarea-field auto-resize"
-              ></textarea>
+              <textarea id="additionalInfo" v-model="additionalInfo" @input="autoResize($event, 60, 400)"
+                placeholder="语言风格/特殊用词等其他要求" class="textarea-field auto-resize"></textarea>
             </div>
           </div>
 
@@ -208,22 +194,12 @@
             <div class="input-row">
               <div class="input-group">
                 <label for="chapterNumber">第几章:</label>
-                <input 
-                  id="chapterNumber"
-                  v-model.number="chapterNumber" 
-                  type="number" 
-                  min="1"
-                  class="input-field"
-                />
+                <input id="chapterNumber" v-model.number="chapterNumber" type="number" min="1" class="input-field" />
               </div>
-              
+
               <div class="input-group">
                 <label for="chapterName">章节命名:</label>
-                <input 
-                  id="chapterName"
-                  v-model="chapterName" 
-                  class="input-field"
-                />
+                <input id="chapterName" v-model="chapterName" class="input-field" />
               </div>
             </div>
 
@@ -231,19 +207,11 @@
             <div class="input-group">
               <label>角色配置:</label>
               <div v-for="(character, index) in characters" :key="index" class="character-juese">
-                <input 
-                  v-model="character.name"
-                  placeholder="角色姓名"
-                  class="input-field small"
-                />
-    
-                <textarea 
-                  v-model="character.setting"
-                  @input="autoResize($event, 60, 200)"
-                  placeholder="角色设定"
-                  class="textarea-field small auto-resize"
-                ></textarea>
-  
+                <input v-model="character.name" placeholder="角色姓名" class="input-field small" />
+
+                <textarea v-model="character.setting" @input="autoResize($event, 60, 200)" placeholder="角色设定"
+                  class="textarea-field small auto-resize"></textarea>
+
                 <button @click="removeCharacter(index)" class="btn-danger">删除</button>
               </div>
               <button @click="addCharacter" class="btn-secondary">添加角色</button>
@@ -252,13 +220,8 @@
             <!-- 情节要求 -->
             <div class="input-group">
               <label for="plotRequirement">情节要求:</label>
-              <textarea 
-                id="plotRequirement"
-                v-model="plotRequirement" 
-                @input="autoResize($event, 100, 500)"
-                placeholder="例如：主角在森林中遇到神秘老人，获得重要线索..."
-                class="textarea-field auto-resize"
-              ></textarea>
+              <textarea id="plotRequirement" v-model="plotRequirement" @input="autoResize($event, 100, 500)"
+                placeholder="例如：主角在森林中遇到神秘老人，获得重要线索..." class="textarea-field auto-resize"></textarea>
             </div>
 
             <!-- 参数管理按钮 -->
@@ -275,7 +238,7 @@
           </div>
         </div>
       </section>
-      
+
       <!-- 生成预览模块 -->
       <section class="module preview">
         <div class="module-header">
@@ -298,19 +261,11 @@
                 </div>
               </div>
             </transition>
-            
-            <button 
-              @click="generateNovel" 
-              :disabled="!canGenerate || isGenerating"
-              class="btn-primary generate-btn"
-            >
+
+            <button @click="generateNovel" :disabled="!canGenerate || isGenerating" class="btn-primary generate-btn">
               {{ isGenerating ? '生成中...' : '生成小说章节' }}
             </button>
-            <button 
-              v-if="!isGenerating && currentContent"
-              @click="toggleEditMode"
-              class="btn-secondary"
-            >
+            <button v-if="!isGenerating && currentContent" @click="toggleEditMode" class="btn-secondary">
               {{ isEditing ? '退出编辑' : '编辑内容' }}
             </button>
           </div>
@@ -321,21 +276,16 @@
             <div class="spinner"></div>
             <p>正在导入数据，请稍候...</p>
           </div>
-          
+
           <!-- 内容选项卡 -->
           <div class="content-tabs" v-if="availableTabs.length > 1">
-            <button 
-              v-for="tab in availableTabs" 
-              :key="tab.id"
-              @click="activeTab = tab.id"
-              :class="{ active: activeTab === tab.id, disabled: !tab.available }"
-              class="tab-button"
-            >
+            <button v-for="tab in availableTabs" :key="tab.id" @click="activeTab = tab.id"
+              :class="{ active: activeTab === tab.id, disabled: !tab.available }" class="tab-button">
               {{ tab.label }}
               <span v-if="tab.badge" class="tab-badge">{{ tab.badge }}</span>
             </button>
           </div>
-          
+
           <!-- 实时内容显示区域 -->
           <div class="preview-content" :class="{ 'generating': isGenerating, 'editing': isEditing }">
             <div class="content-display">
@@ -346,7 +296,7 @@
                   <button @click="cancelEdit" class="btn-secondary small">取消</button>
                 </div>
               </div>
-              
+
               <!-- 最终内容视图 -->
               <div v-if="activeTab === 'final' && !isEditing" class="content-view">
                 <template v-if="isGenerating && displayedContent">
@@ -368,7 +318,7 @@
                   </div>
                 </template>
               </div>
-              
+
               <!-- 思维链视图 -->
               <div v-if="activeTab === 'reasoning' && !isEditing" class="reasoning-view">
                 <template v-if="isGenerating && displayedReasoning">
@@ -390,7 +340,7 @@
                   </div>
                 </template>
               </div>
-              
+
               <!-- 合并视图 -->
               <div v-if="activeTab === 'combined' && !isEditing" class="combined-view">
                 <template v-if="isGenerating">
@@ -430,60 +380,44 @@
                   </div>
                 </template>
               </div>
-              
+
               <!-- 编辑模式 -->
-              <textarea 
-                v-if="isEditing"
-                v-model="editingContent"
-                @input="autoResize($event, 400, 800)"
-                class="content-textarea auto-resize"
-                placeholder="请在此编辑小说内容..."
-              ></textarea>
+              <textarea v-if="isEditing" v-model="editingContent" @input="autoResize($event, 400, 800)"
+                class="content-textarea auto-resize" placeholder="请在此编辑小说内容..."></textarea>
             </div>
-            
+
             <!-- 统计信息 -->
             <div v-if="displayedContent || currentContent" class="content-stats">
               <p>
-                总字符数: {{ currentStats.characterCount }} | 
+                总字符数: {{ currentStats.characterCount }} |
                 中文字符: {{ currentStats.chineseCount }}
                 <span v-if="reasoningStats.length > 0">
                   | 思维链: {{ reasoningStats.length }} 字符
                 </span>
               </p>
             </div>
-            
+
             <!-- 操作按钮 -->
             <div v-if="!isGenerating && currentContent && !isEditing" class="preview-actions">
               <button @click="saveCurrentContent" class="btn-success">保存到历史</button>
               <button @click="clearCurrentContent" class="btn-secondary">清空预览</button>
-              <button 
-                v-if="currentReasoning"
-                @click="downloadReasoning"
-                class="btn-secondary"
-              >
+              <button v-if="currentReasoning" @click="downloadReasoning" class="btn-secondary">
                 下载思维链
               </button>
             </div>
           </div>
         </div>
       </section>
-      
+
       <!-- 已生成内容查看模块 -->
       <section class="module history">
         <div class="module-header">
           <h2>已生成内容</h2>
           <div class="header-actions">
-            <button 
-              v-if="history.length > 0"
-              @click="downloadAllChapters"
-              class="btn-primary"
-            >
+            <button v-if="history.length > 0" @click="downloadAllChapters" class="btn-primary">
               下载全本
             </button>
-            <button 
-              @click="importAllChapters"
-              class="btn-secondary"
-            >
+            <button @click="importAllChapters" class="btn-secondary">
               导入全本
             </button>
           </div>
@@ -494,20 +428,14 @@
             <p>暂无历史记录</p>
             <p>生成的章节将显示在这里</p>
           </div>
-          
+
           <div v-else class="history-list">
-            <div 
-              v-for="(item, index) in sortedHistory" 
-              :key="index" 
-              class="history-item"
-              :class="{ 
-                active: selectedHistoryIndex === index,
-                edited: item.isEdited,
-                imported: item.imported,
-                hasReasoning: item.reasoningContent
-              }"
-              @click="selectHistoryItem(index)"
-            >
+            <div v-for="(item, index) in sortedHistory" :key="index" class="history-item" :class="{
+              active: selectedHistoryIndex === index,
+              edited: item.isEdited,
+              imported: item.imported,
+              hasReasoning: item.reasoningContent
+            }" @click="selectHistoryItem(index)">
               <div class="history-item-header">
                 <h4>{{ item.chapterTitle }}</h4>
                 <div class="item-badges">
@@ -518,18 +446,14 @@
               </div>
               <p class="preview-text">{{ getContentPreview(item.content) }}</p>
               <p class="meta-info">
-                字符: {{ item.characterCount }} | 中文: {{ item.chineseCount }} | 
+                字符: {{ item.characterCount }} | 中文: {{ item.chineseCount }} |
                 {{ formatDate(item.timestamp) }}
               </p>
               <div class="history-actions">
                 <button @click.stop="viewContent(item)" class="btn-secondary small">
                   查看
                 </button>
-                <button 
-                  v-if="item.reasoningContent"
-                  @click.stop="viewReasoning(item)"
-                  class="btn-secondary small"
-                >
+                <button v-if="item.reasoningContent" @click.stop="viewReasoning(item)" class="btn-secondary small">
                   查看思维链
                 </button>
                 <button @click.stop="editHistoryItem(item, index)" class="btn-secondary small">
@@ -538,11 +462,8 @@
                 <button @click.stop="downloadContent(item)" class="btn-secondary small">
                   下载
                 </button>
-                <button 
-                  v-if="item.reasoningContent"
-                  @click.stop="downloadReasoningOnly(item)"
-                  class="btn-secondary small"
-                >
+                <button v-if="item.reasoningContent" @click.stop="downloadReasoningOnly(item)"
+                  class="btn-secondary small">
                   下载思维链
                 </button>
                 <button @click.stop="deleteHistoryItem(index)" class="btn-danger small">
@@ -558,13 +479,13 @@
 </template>
 
 <script>
-import { 
-  generateContent, 
-  processStream, 
-  buildSystemConfig, 
-  buildUserConfig, 
+import {
+  generateContent,
+  processStream,
+  buildSystemConfig,
+  buildUserConfig,
   countChineseCharacters,
-  combineReasoningAndContent 
+  combineReasoningAndContent
 } from './novelGenerator';
 
 export default {
@@ -577,12 +498,12 @@ export default {
       model: 'deepseek-reasoner',
       enableReasoning: true,
       reasoningDisplay: 'separate',
-      
+
       // 基础设定
       worldView: '',
       perspective: '第三人称',
       additionalInfo: '',
-      
+
       // 章节配置
       chapterNumber: 1,
       chapterName: '',
@@ -590,7 +511,7 @@ export default {
         { name: '', setting: '' }
       ],
       plotRequirement: '',
-      
+
       // 生成状态
       isGenerating: false,
       generationProgress: 0,
@@ -607,23 +528,23 @@ export default {
       reasoningStats: {
         length: 0
       },
-      
+
       // 编辑状态
       isEditing: false,
       editingContent: '',
       editingIndex: -1,
       originalContent: '',
-      
+
       // 历史记录
       history: [],
       selectedHistoryIndex: -1,
-      
+
       // 新增：参数版本控制
       parametersVersion: '1.1',
-      
+
       // 新增：导入文件相关
       isImporting: false,
-      
+
       // 新增：用户协议状态
       showAgreementModal: false,
       isScrollingModal: false,
@@ -651,7 +572,7 @@ export default {
     },
     availableTabs() {
       const tabs = [];
-      
+
       if (this.reasoningDisplay === 'combined') {
         if (this.currentContent && this.currentReasoning) {
           tabs.push({ id: 'combined', label: '合并视图', available: true });
@@ -666,7 +587,7 @@ export default {
           tabs.push({ id: 'reasoning', label: '思维链', available: !!this.currentReasoning });
         }
       }
-      
+
       return tabs;
     },
     hasMultipleViews() {
@@ -685,7 +606,7 @@ export default {
         this.enableReasoning = true;
       }
     },
-    
+
     reasoningDisplay(newValue) {
       if (newValue === 'combined') {
         this.activeTab = 'combined';
@@ -695,7 +616,7 @@ export default {
         this.activeTab = 'final';
       }
     },
-    
+
     worldView(newVal) {
       if (newVal !== undefined) {
         this.debouncedSaveParameters();
@@ -761,7 +682,7 @@ export default {
         this.debouncedSaveParameters();
       }
     },
-    
+
     isGenerating(isGenerating) {
       if (isGenerating) {
         this.startGenerationProgress();
@@ -787,7 +708,7 @@ export default {
       this.showAgreementModal = true;
       document.body.style.overflow = 'hidden';
     }
-    
+
     this.debouncedSaveParameters = this.debounce(() => {
       this.saveAllParameters();
     }, 1000);
@@ -798,43 +719,46 @@ export default {
       const modalContent = document.querySelector('.modal-content');
       if (modalContent) {
         const isAtBottom = modalContent.scrollHeight - modalContent.scrollTop <= modalContent.clientHeight + 10;
-        
+
         if (!isAtBottom) {
           alert('请先阅读完整的用户协议内容至底部，然后才能同意。');
           return;
         }
       }
-      
+
       this.showAgreementModal = false;
       localStorage.setItem('novelGeneratorAgreement', 'accepted');
-      
+
       // 恢复滚动
       document.body.style.overflow = '';
       document.body.style.overflowX = '';
       document.body.style.overflowY = '';
     },
-    
+
     onModalScroll(event) {
       const modalContent = event.target;
       const scrollTop = modalContent.scrollTop;
       const scrollHeight = modalContent.scrollHeight;
       const clientHeight = modalContent.clientHeight;
-      
+
       const progress = (scrollTop / (scrollHeight - clientHeight)) * 100;
       this.scrollProgress = Math.min(100, Math.max(0, progress));
-      
+
       this.isScrollingModal = scrollHeight - scrollTop > clientHeight + 50;
     },
-    
+
     rejectAgreement() {
-      alert('您必须同意用户协议才能使用DeepSeek小说生成框架。');
-      // 即使拒绝，也要恢复滚动，让用户可以重新访问
-      document.body.style.overflow = '';
-      document.body.style.overflowX = '';
-      document.body.style.overflowY = '';
-      this.showAgreementModal = false;
+      alert('要使用DeepSeek小说生成框架，您必须同意用户协议。');
+      // 不关闭弹窗，让用户只能选择同意或刷新页面
+      // 也可以滚动到顶部让用户重新阅读
+      const modalContent = document.querySelector('.modal-content');
+      if (modalContent) {
+        modalContent.scrollTop = 0;
+        this.scrollProgress = 0;
+        this.isScrollingModal = true;
+      }
     },
-    
+
     scrollToBottom() {
       const modalContent = document.querySelector('.modal-content');
       if (modalContent) {
@@ -843,30 +767,30 @@ export default {
         this.isScrollingModal = false;
       }
     },
-    
+
     // 自动调整textarea高度
     autoResize(event, minHeight = 60, maxHeight = 400) {
       const textarea = event.target;
-      
+
       const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-      
+
       textarea.style.height = 'auto';
-      
+
       let newHeight = textarea.scrollHeight + 2;
       newHeight = Math.max(minHeight, newHeight);
       newHeight = Math.min(maxHeight, newHeight);
-      
+
       textarea.style.height = `${newHeight}px`;
-      
+
       if (newHeight >= maxHeight) {
         textarea.style.overflowY = 'auto';
       } else {
         textarea.style.overflowY = 'hidden';
       }
-      
+
       window.scrollTo(0, scrollTop);
     },
-    
+
     // 初始化所有textarea高度
     initTextareaHeights() {
       this.$nextTick(() => {
@@ -877,7 +801,7 @@ export default {
         });
       });
     },
-    
+
     // 防抖函数
     debounce(func, wait) {
       let timeout;
@@ -890,21 +814,21 @@ export default {
         timeout = setTimeout(later, wait);
       };
     },
-    
+
     // 开始生成进度动画
     startGenerationProgress() {
       this.generationProgress = 10;
       if (this.generationTimer) {
         clearInterval(this.generationTimer);
       }
-      
+
       this.generationTimer = setInterval(() => {
         if (this.generationProgress < 90) {
           this.generationProgress += 5;
         }
       }, 500);
     },
-    
+
     // 停止生成进度动画
     stopGenerationProgress() {
       if (this.generationTimer) {
@@ -924,17 +848,17 @@ export default {
         }, 50);
       }
     },
-    
+
     // API密钥显示切换
     toggleApiKeyVisibility() {
       this.showApiKey = !this.showApiKey;
     },
-    
+
     // 跳转到获取API密钥页面
     goToGetAPIKey() {
       window.open('https://platform.deepseek.com/usage', '_blank');
     },
-    
+
     // 角色管理
     addCharacter() {
       this.characters.push({ name: '', setting: '' });
@@ -942,13 +866,13 @@ export default {
         this.initTextareaHeights();
       });
     },
-    
+
     removeCharacter(index) {
       if (this.characters.length > 1) {
         this.characters.splice(index, 1);
       }
     },
-    
+
     // 保存所有参数到本地存储
     saveAllParameters() {
       const parameters = {
@@ -963,10 +887,10 @@ export default {
         chapterNumber: this.chapterNumber,
         chapterName: this.chapterName,
         characters: JSON.parse(JSON.stringify(this.characters)),
-        plotRequirement:this.plotRequirement,
+        plotRequirement: this.plotRequirement,
         savedAt: new Date().toISOString()
       };
-      
+
       try {
         localStorage.setItem('novelParameters', JSON.stringify(parameters));
         console.log('参数已保存到本地存储');
@@ -974,13 +898,13 @@ export default {
         console.error('保存参数失败:', error);
       }
     },
-    
+
     // 手动保存当前参数
     saveCurrentParameters() {
       this.saveAllParameters();
       alert('参数已保存！');
     },
-    
+
     // 重置参数
     resetParameters() {
       if (confirm('确定要重置所有参数吗？这将清除当前的配置。')) {
@@ -994,24 +918,24 @@ export default {
         this.model = 'deepseek-reasoner';
         this.enableReasoning = true;
         this.reasoningDisplay = 'separate';
-        
+
         localStorage.removeItem('novelParameters');
-        
+
         this.$nextTick(() => {
           this.initTextareaHeights();
         });
-        
+
         alert('参数已重置！');
       }
     },
-    
+
     // 加载保存的参数
     loadAllParameters() {
       try {
         const saved = localStorage.getItem('novelParameters');
         if (saved) {
           const parameters = JSON.parse(saved);
-          
+
           if (parameters.version === this.parametersVersion) {
             this.apiKey = parameters.apiKey || '';
             this.model = parameters.model || 'deepseek-reasoner';
@@ -1022,23 +946,23 @@ export default {
             this.additionalInfo = parameters.additionalInfo || '';
             this.chapterNumber = parameters.chapterNumber || 1;
             this.chapterName = parameters.chapterName || '';
-            this.characters = parameters.characters && parameters.characters.length > 0 
-              ? parameters.characters 
+            this.characters = parameters.characters && parameters.characters.length > 0
+              ? parameters.characters
               : [{ name: '', setting: '' }];
             this.plotRequirement = parameters.plotRequirement || '';
-            
+
             if (this.reasoningDisplay === 'combined') {
               this.activeTab = 'combined';
             } else if (this.reasoningDisplay === 'hide') {
               this.activeTab = 'final';
             }
-            
+
             console.log('参数已从本地存储加载');
-            
+
             this.$nextTick(() => {
               this.initTextareaHeights();
             });
-            
+
             return true;
           } else {
             console.warn('参数版本不兼容，使用默认参数');
@@ -1049,13 +973,13 @@ export default {
       }
       return false;
     },
-    
+
     // 生成小说
     async generateNovel() {
       if (!this.canGenerate) return;
-      
+
       this.saveAllParameters();
-      
+
       this.isGenerating = true;
       this.currentContent = null;
       this.currentReasoning = '';
@@ -1069,7 +993,7 @@ export default {
         length: 0
       };
       this.isEditing = false;
-      
+
       if (this.reasoningDisplay === 'combined') {
         this.activeTab = 'combined';
       } else if (this.reasoningDisplay === 'hide') {
@@ -1077,14 +1001,14 @@ export default {
       } else {
         this.activeTab = 'final';
       }
-      
+
       try {
         const systemConfig = buildSystemConfig(
           this.worldView,
           this.perspective,
           this.additionalInfo
         );
-        
+
         const userConfig = buildUserConfig(
           this.chapterNumber,
           this.chapterName,
@@ -1092,14 +1016,14 @@ export default {
           this.characters.filter(char => char.name || char.setting),
           this.getHistoryContext()
         );
-        
-        console.log('开始生成小说...', { 
-          systemConfig, 
+
+        console.log('开始生成小说...', {
+          systemConfig,
           userConfig,
           model: this.model,
           enableReasoning: this.enableReasoning
         });
-        
+
         const stream = await generateContent({
           apiKey: this.apiKey,
           systemConfig,
@@ -1107,32 +1031,32 @@ export default {
           model: this.model,
           enableReasoning: this.enableReasoning
         });
-        
+
         const result = await processStream(stream, (update) => {
           this.currentStats = {
             characterCount: update.characterCount,
             chineseCount: update.chineseCount
           };
-          
+
           if (update.reasoningContent) {
             this.reasoningStats.length = update.reasoningContent.length;
           }
-          
+
           this.displayedContent = update.content;
-          
+
           if (update.reasoningContent) {
             this.displayedReasoning = update.reasoningContent;
           }
-          
+
           if (update.characterCount > 0) {
             this.generationProgress = Math.min(95, 10 + (update.characterCount / 2000) * 85);
           }
-          
+
           this.$nextTick(() => {
             this.scrollToBottom();
           });
         });
-        
+
         if (result.success) {
           this.currentContent = {
             chapterTitle: `第${this.chapterNumber}章${this.chapterName ? `: ${this.chapterName}` : ''}`,
@@ -1150,26 +1074,26 @@ export default {
               enableReasoning: this.enableReasoning
             }
           };
-          
+
           if (result.reasoningContent) {
             this.currentReasoning = result.reasoningContent;
-            
+
             if (this.reasoningDisplay === 'combined') {
               this.activeTab = 'combined';
             }
           }
-          
+
           this.displayedContent = result.finalContent;
           this.displayedReasoning = result.reasoningContent || '';
-          
+
           this.generationProgress = 100;
-          
+
           console.log('生成完成', this.currentContent);
           console.log('思维链长度:', result.reasoningContent ? result.reasoningContent.length : 0);
         } else {
           throw new Error(result.error || '生成失败');
         }
-        
+
       } catch (error) {
         console.error('生成失败:', error);
         alert(`生成失败: ${error.message}`);
@@ -1177,7 +1101,7 @@ export default {
         this.isGenerating = false;
       }
     },
-    
+
     // 滚动到底部
     scrollToBottom() {
       const contentElement = this.$refs.contentText || this.$refs.reasoningText;
@@ -1185,33 +1109,33 @@ export default {
         contentElement.scrollTop = contentElement.scrollHeight;
       }
     },
-    
+
     // 获取历史上下文
     getHistoryContext() {
       if (this.history.length === 0) return '';
-      
+
       return this.history
         .slice(-3)
         .map(item => `${item.chapterTitle}\n${item.content}`)
         .join('\n\n');
     },
-    
+
     // 保存当前内容
     saveCurrentContent() {
       if (!this.currentContent) return;
-      
+
       this.currentContent.characterCount = this.currentContent.content.length;
       this.currentContent.chineseCount = countChineseCharacters(this.currentContent.content);
-      
+
       if (this.currentReasoning) {
         this.currentContent.reasoningContent = this.currentReasoning;
       }
-      
+
       this.history.push({ ...this.currentContent });
       this.saveHistory();
       alert('保存成功！');
     },
-    
+
     // 清空当前预览内容
     clearCurrentContent() {
       this.currentContent = null;
@@ -1232,7 +1156,7 @@ export default {
         length: 0
       };
     },
-    
+
     // 查看历史内容
     viewContent(content) {
       this.currentContent = { ...content };
@@ -1243,14 +1167,14 @@ export default {
         chineseCount: content.chineseCount
       };
       this.isEditing = false;
-      
+
       if (this.reasoningDisplay === 'combined' && this.currentReasoning) {
         this.activeTab = 'combined';
       } else {
         this.activeTab = 'final';
       }
     },
-    
+
     // 查看思维链内容
     viewReasoning(content) {
       if (content.reasoningContent) {
@@ -1261,14 +1185,14 @@ export default {
         this.activeTab = 'reasoning';
       }
     },
-    
+
     // 选择历史项
     selectHistoryItem(index) {
       this.selectedHistoryIndex = index;
       const content = this.sortedHistory[index];
       this.viewContent(content);
     },
-    
+
     // 编辑历史项
     editHistoryItem(content, index) {
       this.currentContent = { ...content };
@@ -1281,7 +1205,7 @@ export default {
       this.selectedHistoryIndex = index;
       this.activeTab = 'final';
     },
-    
+
     // 切换编辑模式
     toggleEditMode() {
       if (this.isEditing) {
@@ -1290,7 +1214,7 @@ export default {
         this.startEdit();
       }
     },
-    
+
     // 开始编辑
     startEdit() {
       if (!this.currentContent) return;
@@ -1300,17 +1224,17 @@ export default {
       this.editingIndex = -1;
       this.activeTab = 'final';
     },
-    
+
     // 保存编辑内容
     saveEditedContent() {
       if (!this.editingContent.trim()) {
         alert('内容不能为空');
         return;
       }
-      
+
       const characterCount = this.editingContent.length;
       const chineseCount = countChineseCharacters(this.editingContent);
-      
+
       if (this.editingIndex >= 0) {
         this.history[this.editingIndex] = {
           ...this.history[this.editingIndex],
@@ -1330,14 +1254,14 @@ export default {
         this.displayedContent = this.editingContent;
         alert('内容修改已保存！');
       }
-      
+
       this.isEditing = false;
       this.currentStats = {
         characterCount: characterCount,
         chineseCount: chineseCount
       };
     },
-    
+
     // 取消编辑
     cancelEdit() {
       this.isEditing = false;
@@ -1345,7 +1269,7 @@ export default {
       this.originalContent = '';
       this.editingIndex = -1;
     },
-    
+
     // 删除历史项
     deleteHistoryItem(index) {
       if (confirm('确定要删除这个章节吗？')) {
@@ -1357,7 +1281,7 @@ export default {
         }
       }
     },
-    
+
     // 下载单个章节
     downloadContent(content) {
       const blob = new Blob([content.content], { type: 'text/plain;charset=utf-8' });
@@ -1367,14 +1291,14 @@ export default {
       link.click();
       URL.revokeObjectURL(link.href);
     },
-    
+
     // 下载思维链
     downloadReasoning() {
       if (!this.currentReasoning) {
         alert('没有可下载的思维链内容');
         return;
       }
-      
+
       const blob = new Blob([this.currentReasoning], { type: 'text/plain;charset=utf-8' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
@@ -1382,14 +1306,14 @@ export default {
       link.click();
       URL.revokeObjectURL(link.href);
     },
-    
+
     // 仅下载思维链
     downloadReasoningOnly(content) {
       if (!content.reasoningContent) {
         alert('该章节没有思维链内容');
         return;
       }
-      
+
       const blob = new Blob([content.reasoningContent], { type: 'text/plain;charset=utf-8' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
@@ -1397,25 +1321,25 @@ export default {
       link.click();
       URL.revokeObjectURL(link.href);
     },
-    
+
     // 下载所有章节
     downloadAllChapters() {
       if (this.history.length === 0) {
         alert('没有可下载的章节');
         return;
       }
-      
+
       const format = confirm('是否导出为JSON格式（包含参数和历史记录）？\n点击"确定"导出JSON，点击"取消"导出TXT')
         ? 'json'
         : 'txt';
-      
+
       if (format === 'json') {
         this.downloadAsJson();
       } else {
         this.downloadAsTxt();
       }
     },
-    
+
     // 导出为JSON格式
     downloadAsJson() {
       const exportData = {
@@ -1423,7 +1347,7 @@ export default {
         version: '1.1',
         exportedAt: new Date().toISOString(),
         generator: 'TaleMaker DS便捷小说生成器',
-        
+
         parameters: {
           apiKey: '',
           model: this.model,
@@ -1437,7 +1361,7 @@ export default {
           characters: JSON.parse(JSON.stringify(this.characters)),
           plotRequirement: this.plotRequirement
         },
-        
+
         history: this.sortedHistory.map(item => ({
           chapterTitle: item.chapterTitle,
           content: item.content,
@@ -1449,7 +1373,7 @@ export default {
           imported: item.imported || false,
           config: item.config || {}
         })),
-        
+
         statistics: {
           totalChapters: this.history.length,
           totalCharacters: this.history.reduce((sum, item) => sum + item.characterCount, 0),
@@ -1457,43 +1381,43 @@ export default {
           chaptersWithReasoning: this.history.filter(item => item.reasoningContent).length
         }
       };
-      
+
       const jsonStr = JSON.stringify(exportData, null, 2);
-      
-      const blob = new Blob([jsonStr], { 
-        type: 'application/json;charset=utf-8' 
+
+      const blob = new Blob([jsonStr], {
+        type: 'application/json;charset=utf-8'
       });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = `小说全本_${this.history.length}章_${new Date().toISOString().slice(0,10)}.json`;
+      link.download = `小说全本_${this.history.length}章_${new Date().toISOString().slice(0, 10)}.json`;
       link.click();
       URL.revokeObjectURL(link.href);
-      
+
       alert('已导出JSON格式全本，可后续导入恢复数据');
     },
-    
+
     // 原有的TXT格式导出
     downloadAsTxt() {
       const sortedChapters = this.sortedHistory;
-      
+
       let fullContent = `《小说全本》\n\n`;
       fullContent += `生成时间: ${new Date().toLocaleString()}\n`;
       fullContent += `总章节数: ${sortedChapters.length}\n`;
       fullContent += `生成工具: TaleMaker DS便捷小说生成器\n`;
       fullContent += `包含思维链的章节数: ${sortedChapters.filter(c => c.reasoningContent).length}\n\n`;
       fullContent += '='.repeat(50) + '\n\n';
-      
+
       sortedChapters.forEach((chapter, index) => {
         fullContent += `${chapter.chapterTitle}\n\n`;
-        
+
         if (chapter.reasoningContent && confirm(`章节"${chapter.chapterTitle}"有思维链内容，是否包含在导出文件中？`)) {
           fullContent += `【模型思考过程】\n${chapter.reasoningContent}\n\n`;
           fullContent += `【生成内容】\n`;
         }
-        
+
         fullContent += chapter.content + '\n\n';
         fullContent += '='.repeat(50) + '\n\n';
-        
+
         fullContent += `[本章统计: 字符数 ${chapter.characterCount} | 中文字符 ${chapter.chineseCount}`;
         if (chapter.isEdited) {
           fullContent += ' | 已编辑';
@@ -1506,16 +1430,16 @@ export default {
         }
         fullContent += ']\n\n';
       });
-      
+
       const totalChars = sortedChapters.reduce((sum, chapter) => sum + chapter.characterCount, 0);
       const totalChinese = sortedChapters.reduce((sum, chapter) => sum + chapter.chineseCount, 0);
-      
+
       fullContent += `\n总体统计:\n`;
       fullContent += `总章节数: ${sortedChapters.length}\n`;
       fullContent += `总字符数: ${totalChars}\n`;
       fullContent += `总中文字符: ${totalChinese}\n`;
       fullContent += `包含思维链的章节数: ${sortedChapters.filter(c => c.reasoningContent).length}\n`;
-      
+
       const blob = new Blob([fullContent], { type: 'text/plain;charset=utf-8' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
@@ -1523,20 +1447,20 @@ export default {
       link.click();
       URL.revokeObjectURL(link.href);
     },
-    
+
     // 导入全本功能
     importAllChapters() {
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = '.json,.txt';
       input.style.display = 'none';
-      
+
       input.onchange = (event) => {
         const file = event.target.files[0];
         if (!file) return;
-        
+
         this.isImporting = true;
-        
+
         const reader = new FileReader();
         reader.onload = (e) => {
           try {
@@ -1550,25 +1474,25 @@ export default {
             document.body.removeChild(input);
           }
         };
-        
+
         reader.onerror = () => {
           alert('读取文件失败');
           this.isImporting = false;
           document.body.removeChild(input);
         };
-        
+
         reader.readAsText(file);
       };
-      
+
       document.body.appendChild(input);
       input.click();
     },
-    
+
     // 处理导入的文件
     processImportedFile(content, filename) {
       try {
         const data = JSON.parse(content);
-        
+
         if (data.format === 'novel-full-export') {
           this.importFullNovelData(data);
         } else if (data.parameters) {
@@ -1581,13 +1505,13 @@ export default {
         this.importAsSingleChapter(content, filename);
       }
     },
-    
+
     // 导入全本数据（新版格式）
     importFullNovelData(data) {
       if (!data.parameters || !data.history) {
         throw new Error('文件格式不正确，缺少必要字段');
       }
-      
+
       if (confirm('是否恢复保存的配置参数？')) {
         this.model = data.parameters.model || 'deepseek-reasoner';
         this.enableReasoning = data.parameters.enableReasoning !== undefined ? data.parameters.enableReasoning : true;
@@ -1597,14 +1521,14 @@ export default {
         this.additionalInfo = data.parameters.additionalInfo || '';
         this.chapterNumber = data.parameters.chapterNumber || 1;
         this.chapterName = data.parameters.chapterName || '';
-        this.characters = data.parameters.characters && data.parameters.characters.length > 0 
-          ? data.parameters.characters 
+        this.characters = data.parameters.characters && data.parameters.characters.length > 0
+          ? data.parameters.characters
           : [{ name: '', setting: '' }];
         this.plotRequirement = data.parameters.plotRequirement || '';
-        
+
         this.saveAllParameters();
       }
-      
+
       if (confirm(`是否导入 ${data.history.length} 个章节到历史记录？`)) {
         this.history = data.history.map(item => ({
           ...item,
@@ -1613,17 +1537,17 @@ export default {
           reasoningContent: item.reasoningContent || '',
           timestamp: item.timestamp || new Date().toISOString()
         }));
-        
+
         this.saveHistory();
-        
+
         alert(`成功导入 ${this.history.length} 个章节！`);
-        
+
         if (this.history.length > 0) {
           this.selectHistoryItem(0);
         }
       }
     },
-    
+
     // 导入旧版格式
     importLegacyFormat(data) {
       if (data.parameters) {
@@ -1635,23 +1559,23 @@ export default {
         this.additionalInfo = data.parameters.additionalInfo || '';
         this.chapterNumber = data.parameters.chapterNumber || 1;
         this.chapterName = data.parameters.chapterName || '';
-        this.characters = data.parameters.characters && data.parameters.characters.length > 0 
-          ? data.parameters.characters 
+        this.characters = data.parameters.characters && data.parameters.characters.length > 0
+          ? data.parameters.characters
           : [{ name: '', setting: '' }];
         this.plotRequirement = data.parameters.plotRequirement || '';
-        
+
         this.saveAllParameters();
         alert('配置参数已恢复！');
       }
     },
-    
+
     // 导入为单个章节
     importAsSingleChapter(content, filename) {
       const chapterMatch = filename.match(/(第\d+章)?(.*)\.(json|txt)/i);
-      const chapterTitle = chapterMatch 
+      const chapterTitle = chapterMatch
         ? (chapterMatch[1] || '') + (chapterMatch[2] || '导入章节')
         : '导入章节';
-      
+
       const newHistoryItem = {
         chapterTitle: chapterTitle,
         content: content,
@@ -1670,30 +1594,30 @@ export default {
           enableReasoning: this.enableReasoning
         }
       };
-      
+
       this.history.push(newHistoryItem);
       this.saveHistory();
-      
+
       this.selectHistoryItem(this.history.length - 1);
-      
+
       alert(`已导入章节: ${chapterTitle}`);
     },
-    
+
     // 内容预览
     getContentPreview(content, length = 100) {
       return content.length > length ? content.substring(0, length) + '...' : content;
     },
-    
+
     // 日期格式化
     formatDate(timestamp) {
       return new Date(timestamp).toLocaleString();
     },
-    
+
     // 本地存储
     saveHistory() {
       localStorage.setItem('novelHistory', JSON.stringify(this.history));
     },
-    
+
     loadHistory() {
       const saved = localStorage.getItem('novelHistory');
       if (saved) {
@@ -1729,8 +1653,13 @@ export default {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .agreement-modal {
@@ -1752,6 +1681,7 @@ export default {
     opacity: 0;
     transform: translateY(30px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -1831,7 +1761,7 @@ export default {
   background: white;
   padding: 20px;
   border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   border-left: 4px solid #3498db;
 }
 
@@ -1999,7 +1929,7 @@ export default {
   background: linear-gradient(135deg, #2c3e50, #4a6572);
   color: white;
   text-align: center;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   flex-shrink: 0;
 }
 
@@ -2022,7 +1952,7 @@ export default {
   background-color: white;
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border: 1px solid #eaeaea;
   display: flex;
   flex-direction: column;
@@ -2116,17 +2046,20 @@ export default {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.3s;
 }
 
-.fade-enter, .fade-leave-to {
+.fade-enter,
+.fade-leave-to {
   opacity: 0;
 }
 
@@ -2141,8 +2074,13 @@ export default {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .progress-text {
@@ -2193,7 +2131,7 @@ export default {
 .history-item:hover {
   background: #e9ecef;
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .history-item.active {
@@ -2266,7 +2204,9 @@ export default {
   flex-direction: column;
 }
 
-.content-view, .reasoning-view, .combined-view {
+.content-view,
+.reasoning-view,
+.combined-view {
   flex: 1;
   min-height: 200px;
   max-height: 100%;
@@ -2364,7 +2304,7 @@ export default {
   background: white;
   color: #3498db;
   border-bottom: 2px solid #3498db;
-  box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .tab-button.disabled {
@@ -2425,7 +2365,9 @@ export default {
 }
 
 /* 内容视图样式 */
-.content-view, .reasoning-view, .combined-view {
+.content-view,
+.reasoning-view,
+.combined-view {
   min-height: 300px;
   max-height: 500px;
   overflow-y: auto;
@@ -2532,8 +2474,16 @@ export default {
 }
 
 @keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
+
+  0%,
+  50% {
+    opacity: 1;
+  }
+
+  51%,
+  100% {
+    opacity: 0;
+  }
 }
 
 /* 编辑模式样式 */
@@ -2645,7 +2595,9 @@ label {
   font-size: 14px;
 }
 
-.input-field, .textarea-field, .select-field {
+.input-field,
+.textarea-field,
+.select-field {
   box-sizing: border-box;
   width: 100%;
   padding: 10px 12px;
@@ -2656,7 +2608,9 @@ label {
   background: white;
 }
 
-.input-field:focus, .textarea-field:focus, .select-field:focus {
+.input-field:focus,
+.textarea-field:focus,
+.select-field:focus {
   outline: none;
   border-color: #3498db;
   box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
@@ -2702,7 +2656,8 @@ label {
   background: #a8a8a8;
 }
 
-.input-field.small, .textarea-field.small {
+.input-field.small,
+.textarea-field.small {
   font-size: 13px;
   margin-bottom: 15px;
 }
@@ -2733,7 +2688,10 @@ label {
 }
 
 /* 按钮样式 */
-.btn-primary, .btn-secondary, .btn-success, .btn-danger {
+.btn-primary,
+.btn-secondary,
+.btn-success,
+.btn-danger {
   padding: 10px 20px;
   border: none;
   border-radius: 6px;
@@ -2791,7 +2749,8 @@ label {
   box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
 }
 
-.btn-secondary.small, .btn-danger.small {
+.btn-secondary.small,
+.btn-danger.small {
   padding: 6px 12px;
   font-size: 12px;
 }
@@ -2853,17 +2812,17 @@ label {
   .main-content {
     grid-template-columns: 1fr 1fr;
   }
-  
+
   .parameter-settings {
     grid-column: 1 / 3;
   }
-  
+
   .parameter-settings .module-content {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
   }
-  
+
   .parameter-settings .config-section {
     margin-bottom: 0;
     display: flex;
@@ -2875,11 +2834,11 @@ label {
   .main-content {
     grid-template-columns: 1fr 2fr 1fr;
   }
-  
+
   .parameter-settings {
     grid-column: auto;
   }
-  
+
   .parameter-settings .module-content {
     display: flex;
     flex-direction: column;
@@ -2893,15 +2852,15 @@ label {
     flex-direction: column;
     gap: 15px;
   }
-  
+
   .module {
     min-height: 300px;
   }
-  
+
   .history-list {
     max-height: 400px;
   }
-  
+
   .floating-generating-indicator {
     position: fixed;
     top: auto;
@@ -2911,105 +2870,105 @@ label {
     min-width: 90%;
     max-width: 90%;
   }
-  
+
   .input-row {
     grid-template-columns: 1fr;
   }
-  
+
   .character-juese {
     grid-template-columns: 1fr;
     gap: 8px;
   }
-  
+
   .input-with-button {
     flex-direction: column;
   }
-  
+
   .module-header {
     flex-direction: column;
     gap: 15px;
     text-align: center;
   }
-  
+
   .header-actions {
     flex-direction: column;
     width: 100%;
   }
-  
+
   .preview-actions {
     flex-direction: column;
   }
-  
+
   .history-actions {
     flex-wrap: wrap;
   }
-  
+
   .content-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
-  
+
   .edit-actions {
     align-self: flex-end;
   }
-  
+
   .parameter-actions {
     flex-direction: column;
   }
-  
+
   .content-tabs {
     flex-wrap: wrap;
   }
-  
+
   .tab-button {
     flex: 1;
     min-width: 80px;
     text-align: center;
   }
-  
+
   .combined-content {
     flex-direction: column;
   }
-  
+
   /* 用户协议弹窗响应式 */
   .agreement-modal {
     max-height: 85vh;
     margin: 10px;
   }
-  
+
   .modal-header {
     padding: 15px 20px;
   }
-  
+
   .modal-header h2 {
     font-size: 1.2rem;
   }
-  
+
   .modal-content {
     padding: 15px 20px;
   }
-  
+
   .agreement-section {
     padding: 15px;
   }
-  
+
   .footer-actions {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .btn-reject,
   .btn-agree {
     width: 100%;
     min-width: auto;
   }
-  
+
   .scroll-progress {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .progress-text {
     text-align: center;
     min-width: auto;
@@ -3035,7 +2994,8 @@ label {
 }
 
 /* 确保内容文本可读且滚动 */
-.content-text, .reasoning-text {
+.content-text,
+.reasoning-text {
   white-space: pre-wrap;
   word-wrap: break-word;
   line-height: 1.8;
