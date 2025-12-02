@@ -3,9 +3,32 @@ import StoryForge from './components/TaleMaker.vue'
 </script>
 
 <template>
-  <StoryForge msg="StoryForge" />
+  <div id="app">
+    <StoryForge msg="StoryForge" />
+  </div>
 </template>
 
 
-<style scoped>
+<style>
+/* 隐藏整个页面的滚动条 */
+html,
+body {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+/* 隐藏所有滚动条 */
+::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
 </style>

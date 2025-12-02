@@ -27,11 +27,49 @@
                 <button @click="toggleApiKeyVisibility" class="btn-secondary">
                   {{ showApiKey ? '隐藏' : '显示' }}
                 </button>
-                <!-- 新增：获取密钥按钮 -->
                 <button @click="goToGetAPIKey" class="btn-secondary get-key-btn">
                   获取密钥
                 </button>
               </div>
+            </div>
+            
+            <!-- 新增：模型配置 -->
+            <div class="input-group">
+              <label for="model">模型选择:</label>
+              <select v-model="model" id="model" class="select-field">
+                <option value="deepseek-reasoner">DeepSeek Reasoner (支持思考过程)</option>
+                <option value="deepseek-chat">DeepSeek Chat (常规版)</option>
+              </select>
+            </div>
+            
+            <!-- 新增：思维链开关 -->
+            <div class="input-group">
+              <div class="checkbox-group">
+                <input 
+                  id="enableReasoning"
+                  v-model="enableReasoning" 
+                  type="checkbox"
+                  class="checkbox-input"
+                  :disabled="model !== 'deepseek-reasoner'"
+                />
+                <label for="enableReasoning" class="checkbox-label">
+                  启用思维链 (展示模型思考过程)
+                  <br></br>
+                  <span v-if="model !== 'deepseek-reasoner'" class="disabled-hint">
+                    (仅DeepSeek Reasoner模型支持)
+                  </span>
+                </label>
+              </div>
+            </div>
+            
+            <!-- 新增：思维链显示选项 -->
+            <div v-if="enableReasoning && model === 'deepseek-reasoner'" class="input-group">
+              <label for="reasoningDisplay">思维链显示方式:</label>
+              <select v-model="reasoningDisplay" id="reasoningDisplay" class="select-field">
+                <option value="separate">独立显示</option>
+                <option value="combined">合并显示</option>
+                <option value="hide">隐藏思维</option>
+              </select>
             </div>
           </div>
 
@@ -45,7 +83,6 @@
                 <option value="第一人称">第一人称</option>
                 <option value="第二人称">第二人称</option>
                 <option value="第三人称">第三人称</option>
-                <option value="上帝视角">上帝视角</option>
               </select>
             </div>
 
@@ -54,9 +91,9 @@
               <textarea 
                 id="worldView"
                 v-model="worldView" 
+                @input="autoResize($event, 60, 400)"
                 placeholder="架空/现实/修仙 可详细设定"
-                class="textarea-field"
-                rows="3"
+                class="textarea-field auto-resize"
               ></textarea>
             </div>
             
@@ -65,9 +102,9 @@
               <textarea 
                 id="additionalInfo"
                 v-model="additionalInfo" 
+                @input="autoResize($event, 60, 400)"
                 placeholder="语言风格/特殊用词等其他要求"
-                class="textarea-field"
-                rows="2"
+                class="textarea-field auto-resize"
               ></textarea>
             </div>
           </div>
@@ -109,9 +146,9 @@
     
                 <textarea 
                   v-model="character.setting"
+                  @input="autoResize($event, 60, 200)"
                   placeholder="角色设定"
-                  class="textarea-field small"
-                  rows="2"
+                  class="textarea-field small auto-resize"
                 ></textarea>
   
                 <button @click="removeCharacter(index)" class="btn-danger">删除</button>
@@ -125,9 +162,9 @@
               <textarea 
                 id="plotRequirement"
                 v-model="plotRequirement" 
+                @input="autoResize($event, 100, 500)"
                 placeholder="例如：主角在森林中遇到神秘老人，获得重要线索..."
-                class="textarea-field"
-                rows="3"
+                class="textarea-field auto-resize"
               ></textarea>
             </div>
 
@@ -151,6 +188,24 @@
         <div class="module-header">
           <h2>生成预览</h2>
           <div class="header-actions">
+            <!-- 生成状态提示（悬浮） -->
+            <transition name="fade">
+              <div v-if="isGenerating" class="floating-generating-indicator">
+                <div class="generating-progress">
+                  <div class="progress-spinner"></div>
+                  <div class="progress-text">
+                    <p class="generating-title">正在生成小说内容...</p>
+                    <p class="generating-stats">
+                      已生成: <span class="stat-value">{{ currentStats.chineseCount }}</span> 中文字符
+                      <span v-if="enableReasoning">
+                        | 思维链: <span class="stat-value">{{ reasoningStats.length }}</span> 字符
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </transition>
+            
             <button 
               @click="generateNovel" 
               :disabled="!canGenerate || isGenerating"
@@ -174,11 +229,18 @@
             <p>正在导入数据，请稍候...</p>
           </div>
           
-          <!-- 生成状态指示器 -->
-          <div v-if="isGenerating" class="generating-indicator">
-            <div class="spinner"></div>
-            <p>正在生成内容，请稍候...</p>
-            <p class="stats">已生成 {{ currentStats.chineseCount }} 个中文字符</p>
+          <!-- 内容选项卡 -->
+          <div class="content-tabs" v-if="availableTabs.length > 1">
+            <button 
+              v-for="tab in availableTabs" 
+              :key="tab.id"
+              @click="activeTab = tab.id"
+              :class="{ active: activeTab === tab.id, disabled: !tab.available }"
+              class="tab-button"
+            >
+              {{ tab.label }}
+              <span v-if="tab.badge" class="tab-badge">{{ tab.badge }}</span>
+            </button>
           </div>
           
           <!-- 实时内容显示区域 -->
@@ -192,23 +254,18 @@
                 </div>
               </div>
               
-              <!-- 编辑模式 -->
-              <textarea 
-                v-if="isEditing"
-                v-model="editingContent"
-                class="content-textarea"
-                placeholder="请在此编辑小说内容..."
-                rows="20"
-              ></textarea>
-              
-              <!-- 阅读模式 -->
-              <div v-else class="content-text" ref="contentText">
+              <!-- 最终内容视图 -->
+              <div v-if="activeTab === 'final' && !isEditing" class="content-view">
                 <template v-if="isGenerating && displayedContent">
-                  <span class="streaming-text">{{ displayedContent }}</span>
-                  <span class="streaming-cursor">|</span>
+                  <div class="streaming-content">
+                    <span class="streaming-text">{{ displayedContent }}</span>
+                    <span class="streaming-cursor">|</span>
+                  </div>
                 </template>
                 <template v-else-if="currentContent">
-                  {{ currentContent.content }}
+                  <div class="content-text" ref="contentText">
+                    {{ currentContent.content }}
+                  </div>
                 </template>
                 <template v-else>
                   <div class="placeholder">
@@ -218,17 +275,101 @@
                   </div>
                 </template>
               </div>
+              
+              <!-- 思维链视图 -->
+              <div v-if="activeTab === 'reasoning' && !isEditing" class="reasoning-view">
+                <template v-if="isGenerating && displayedReasoning">
+                  <div class="streaming-reasoning">
+                    <span class="streaming-text reasoning-text">{{ displayedReasoning }}</span>
+                    <span class="streaming-cursor">|</span>
+                  </div>
+                </template>
+                <template v-else-if="currentReasoning">
+                  <div class="reasoning-text" ref="reasoningText">
+                    {{ currentReasoning }}
+                  </div>
+                </template>
+                <template v-else>
+                  <div class="placeholder">
+                    <div class="placeholder-icon">🤔</div>
+                    <p>模型思考过程将显示在这里</p>
+                    <p>需要启用思维链功能</p>
+                  </div>
+                </template>
+              </div>
+              
+              <!-- 合并视图 -->
+              <div v-if="activeTab === 'combined' && !isEditing" class="combined-view">
+                <template v-if="isGenerating">
+                  <div class="combined-content">
+                    <div class="combined-section">
+                      <h4>模型思考过程</h4>
+                      <div class="streaming-reasoning">
+                        <span class="streaming-text reasoning-text">{{ displayedReasoning }}</span>
+                        <span class="streaming-cursor">|</span>
+                      </div>
+                    </div>
+                    <div class="combined-divider"></div>
+                    <div class="combined-section">
+                      <h4>生成内容</h4>
+                      <div class="streaming-content">
+                        <span class="streaming-text">{{ displayedContent }}</span>
+                        <span class="streaming-cursor">|</span>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+                <template v-else-if="hasCombinedContent">
+                  <div class="combined-content">
+                    <div class="combined-section">
+                      <h4>模型思考过程</h4>
+                      <div class="reasoning-text">
+                        {{ currentReasoning }}
+                      </div>
+                    </div>
+                    <div class="combined-divider"></div>
+                    <div class="combined-section">
+                      <h4>生成内容</h4>
+                      <div class="content-text">
+                        {{ currentContent.content }}
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+              
+              <!-- 编辑模式 -->
+              <textarea 
+                v-if="isEditing"
+                v-model="editingContent"
+                @input="autoResize($event, 400, 800)"
+                class="content-textarea auto-resize"
+                placeholder="请在此编辑小说内容..."
+              ></textarea>
             </div>
             
             <!-- 统计信息 -->
             <div v-if="displayedContent || currentContent" class="content-stats">
-              <p>总字符数: {{ currentStats.characterCount }} | 中文字符: {{ currentStats.chineseCount }}</p>
+              <p>
+                总字符数: {{ currentStats.characterCount }} | 
+                中文字符: {{ currentStats.chineseCount }}
+                <span v-if="reasoningStats.length > 0">
+                  | 思维链: {{ reasoningStats.length }} 字符
+                </span>
+              </p>
             </div>
             
             <!-- 操作按钮 -->
             <div v-if="!isGenerating && currentContent && !isEditing" class="preview-actions">
               <button @click="saveCurrentContent" class="btn-success">保存到历史</button>
               <button @click="clearCurrentContent" class="btn-secondary">清空预览</button>
+              <button 
+                v-if="currentReasoning"
+                @click="downloadReasoning"
+                class="btn-secondary"
+              >
+                下载思维链
+              </button>
             </div>
           </div>
         </div>
@@ -246,7 +387,6 @@
             >
               下载全本
             </button>
-            <!-- 新增：导入全本按钮 -->
             <button 
               @click="importAllChapters"
               class="btn-secondary"
@@ -270,7 +410,8 @@
               :class="{ 
                 active: selectedHistoryIndex === index,
                 edited: item.isEdited,
-                imported: item.imported 
+                imported: item.imported,
+                hasReasoning: item.reasoningContent
               }"
               @click="selectHistoryItem(index)"
             >
@@ -279,6 +420,7 @@
                 <div class="item-badges">
                   <span v-if="item.isEdited" class="edited-badge">已编辑</span>
                   <span v-if="item.imported" class="imported-badge">已导入</span>
+                  <span v-if="item.reasoningContent" class="reasoning-badge">有思维链</span>
                 </div>
               </div>
               <p class="preview-text">{{ getContentPreview(item.content) }}</p>
@@ -290,11 +432,25 @@
                 <button @click.stop="viewContent(item)" class="btn-secondary small">
                   查看
                 </button>
+                <button 
+                  v-if="item.reasoningContent"
+                  @click.stop="viewReasoning(item)"
+                  class="btn-secondary small"
+                >
+                  查看思维链
+                </button>
                 <button @click.stop="editHistoryItem(item, index)" class="btn-secondary small">
                   编辑
                 </button>
                 <button @click.stop="downloadContent(item)" class="btn-secondary small">
                   下载
+                </button>
+                <button 
+                  v-if="item.reasoningContent"
+                  @click.stop="downloadReasoningOnly(item)"
+                  class="btn-secondary small"
+                >
+                  下载思维链
                 </button>
                 <button @click.stop="deleteHistoryItem(index)" class="btn-danger small">
                   删除
@@ -309,7 +465,14 @@
 </template>
 
 <script>
-import { generateContent, processStream, buildSystemConfig, buildUserConfig, countChineseCharacters } from './novelGenerator';
+import { 
+  generateContent, 
+  processStream, 
+  buildSystemConfig, 
+  buildUserConfig, 
+  countChineseCharacters,
+  combineReasoningAndContent 
+} from './novelGenerator';
 
 export default {
   name: 'NovelGenerator',
@@ -318,6 +481,9 @@ export default {
       // API配置
       apiKey: '',
       showApiKey: false,
+      model: 'deepseek-reasoner',
+      enableReasoning: true,
+      reasoningDisplay: 'separate',
       
       // 基础设定
       worldView: '',
@@ -334,11 +500,19 @@ export default {
       
       // 生成状态
       isGenerating: false,
+      generationProgress: 0, // 新增：生成进度
+      generationTimer: null, // 新增：进度计时器
       currentContent: null,
+      currentReasoning: '', // 新增：存储思维链内容
       displayedContent: '', // 实时显示的内容
+      displayedReasoning: '', // 新增：实时显示的思维链内容
+      activeTab: 'final', // 当前激活的选项卡
       currentStats: {
         characterCount: 0,
         chineseCount: 0
+      },
+      reasoningStats: {
+        length: 0
       },
       
       // 编辑状态
@@ -352,7 +526,7 @@ export default {
       selectedHistoryIndex: -1,
       
       // 新增：参数版本控制
-      parametersVersion: '1.0',
+      parametersVersion: '1.1', // 更新版本号以支持思维链
       
       // 新增：导入文件相关
       isImporting: false
@@ -377,13 +551,69 @@ export default {
         };
         return getChapterNum(a.chapterTitle) - getChapterNum(b.chapterTitle);
       });
+    },
+    availableTabs() {
+      const tabs = [];
+      
+      // 根据显示方式决定显示的选项卡
+      if (this.reasoningDisplay === 'combined') {
+        // 合并显示：只显示合并视图
+        if (this.currentContent && this.currentReasoning) {
+          tabs.push({ id: 'combined', label: '合并视图', available: true });
+        } else if (this.isGenerating) {
+          tabs.push({ id: 'combined', label: '合并视图', available: true });
+        }
+      } else if (this.reasoningDisplay === 'hide') {
+        // 隐藏思维链：只显示最终内容
+        tabs.push({ id: 'final', label: '最终内容', available: true });
+      } else {
+        // 单独显示：显示最终内容和思维链
+        tabs.push({ id: 'final', label: '最终内容', available: true });
+        if (this.currentReasoning || this.isGenerating) {
+          tabs.push({ id: 'reasoning', label: '思维链', available: !!this.currentReasoning });
+        }
+      }
+      
+      return tabs;
+    },
+    hasMultipleViews() {
+      return this.availableTabs.length > 1;
+    },
+    hasCombinedContent() {
+      return this.currentContent && this.currentReasoning;
     }
   },
   watch: {
+    // 监听模型变化，如果模型不是reasoner，则禁用思维链
+    model(newModel) {
+      if (newModel !== 'deepseek-reasoner') {
+        this.enableReasoning = false;
+        this.reasoningDisplay = 'separate';
+      } else {
+        this.enableReasoning = true;
+      }
+    },
+    
+    // 监听思维链显示方式变化
+    reasoningDisplay(newValue) {
+      // 根据显示方式自动切换选项卡
+      if (newValue === 'combined') {
+        this.activeTab = 'combined';
+      } else if (newValue === 'hide') {
+        this.activeTab = 'final';
+      } else {
+        this.activeTab = 'final';
+      }
+    },
+    
     // 监听主要参数变化并自动保存
     worldView(newVal) {
       if (newVal !== undefined) {
         this.debouncedSaveParameters();
+        // 自动调整高度
+        this.$nextTick(() => {
+          this.initTextareaHeights();
+        });
       }
     },
     perspective(newVal) {
@@ -394,6 +624,10 @@ export default {
     additionalInfo(newVal) {
       if (newVal !== undefined) {
         this.debouncedSaveParameters();
+        // 自动调整高度
+        this.$nextTick(() => {
+          this.initTextareaHeights();
+        });
       }
     },
     chapterNumber(newVal) {
@@ -409,20 +643,56 @@ export default {
     plotRequirement(newVal) {
       if (newVal !== undefined) {
         this.debouncedSaveParameters();
+        // 自动调整高度
+        this.$nextTick(() => {
+          this.initTextareaHeights();
+        });
       }
     },
     characters: {
       handler(newVal) {
         if (newVal !== undefined) {
           this.debouncedSaveParameters();
+          // 自动调整角色设定框高度
+          this.$nextTick(() => {
+            this.initTextareaHeights();
+          });
         }
       },
       deep: true
+    },
+    model(newVal) {
+      if (newVal !== undefined) {
+        this.debouncedSaveParameters();
+      }
+    },
+    enableReasoning(newVal) {
+      if (newVal !== undefined) {
+        this.debouncedSaveParameters();
+      }
+    },
+    reasoningDisplay(newVal) {
+      if (newVal !== undefined) {
+        this.debouncedSaveParameters();
+      }
+    },
+    
+    // 监听生成状态
+    isGenerating(isGenerating) {
+      if (isGenerating) {
+        this.startGenerationProgress();
+      } else {
+        this.stopGenerationProgress();
+      }
     }
   },
   mounted() {
     this.loadHistory();
     this.loadAllParameters();
+    // 初始化所有自动调整的textarea高度
+    this.$nextTick(() => {
+      this.initTextareaHeights();
+    });
   },
   created() {
     // 创建防抖的保存函数
@@ -431,6 +701,47 @@ export default {
     }, 1000);
   },
   methods: {
+    // 自动调整textarea高度
+    autoResize(event, minHeight = 60, maxHeight = 400) {
+      const textarea = event.target;
+      
+      // 保存当前滚动位置（防止页面跳动）
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      
+      // 重置高度以便正确计算scrollHeight
+      textarea.style.height = 'auto';
+      
+      // 计算新高度
+      let newHeight = textarea.scrollHeight + 2;
+      newHeight = Math.max(minHeight, newHeight);
+      newHeight = Math.min(maxHeight, newHeight);
+      
+      // 应用新高度
+      textarea.style.height = `${newHeight}px`;
+      
+      // 控制滚动条显示
+      if (newHeight >= maxHeight) {
+        textarea.style.overflowY = 'auto';
+      } else {
+        textarea.style.overflowY = 'hidden';
+      }
+      
+      // 恢复滚动位置
+      window.scrollTo(0, scrollTop);
+    },
+    
+    // 初始化所有textarea高度
+    initTextareaHeights() {
+      this.$nextTick(() => {
+        const textareas = document.querySelectorAll('.auto-resize');
+        textareas.forEach(textarea => {
+          // 模拟input事件以触发调整
+          const event = new Event('input', { bubbles: true });
+          textarea.dispatchEvent(event);
+        });
+      });
+    },
+    
     // 防抖函数
     debounce(func, wait) {
       let timeout;
@@ -442,6 +753,41 @@ export default {
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
       };
+    },
+    
+    // 开始生成进度动画
+    startGenerationProgress() {
+      this.generationProgress = 10;
+      if (this.generationTimer) {
+        clearInterval(this.generationTimer);
+      }
+      
+      this.generationTimer = setInterval(() => {
+        if (this.generationProgress < 90) {
+          this.generationProgress += 5;
+        }
+      }, 500);
+    },
+    
+    // 停止生成进度动画
+    stopGenerationProgress() {
+      if (this.generationTimer) {
+        clearInterval(this.generationTimer);
+        this.generationTimer = null;
+      }
+      // 完成后动画到100%
+      if (this.generationProgress < 100) {
+        const interval = setInterval(() => {
+          if (this.generationProgress < 100) {
+            this.generationProgress += 5;
+          } else {
+            clearInterval(interval);
+            setTimeout(() => {
+              this.generationProgress = 0;
+            }, 500);
+          }
+        }, 50);
+      }
     },
     
     // API密钥显示切换
@@ -457,6 +803,10 @@ export default {
     // 角色管理
     addCharacter() {
       this.characters.push({ name: '', setting: '' });
+      // 添加角色后自动调整高度
+      this.$nextTick(() => {
+        this.initTextareaHeights();
+      });
     },
     
     removeCharacter(index) {
@@ -470,6 +820,9 @@ export default {
       const parameters = {
         version: this.parametersVersion,
         apiKey: this.apiKey,
+        model: this.model,
+        enableReasoning: this.enableReasoning,
+        reasoningDisplay: this.reasoningDisplay,
         worldView: this.worldView,
         perspective: this.perspective,
         additionalInfo: this.additionalInfo,
@@ -504,9 +857,18 @@ export default {
         this.chapterName = '';
         this.characters = [{ name: '', setting: '' }];
         this.plotRequirement = '';
+        this.model = 'deepseek-reasoner';
+        this.enableReasoning = true;
+        this.reasoningDisplay = 'separate';
         
         // 清除本地存储的参数
         localStorage.removeItem('novelParameters');
+        
+        // 重置后调整textarea高度
+        this.$nextTick(() => {
+          this.initTextareaHeights();
+        });
+        
         alert('参数已重置！');
       }
     },
@@ -521,6 +883,9 @@ export default {
           // 检查版本兼容性
           if (parameters.version === this.parametersVersion) {
             this.apiKey = parameters.apiKey || '';
+            this.model = parameters.model || 'deepseek-reasoner';
+            this.enableReasoning = parameters.enableReasoning !== undefined ? parameters.enableReasoning : true;
+            this.reasoningDisplay = parameters.reasoningDisplay || 'separate';
             this.worldView = parameters.worldView || '';
             this.perspective = parameters.perspective || '第三人称';
             this.additionalInfo = parameters.additionalInfo || '';
@@ -531,7 +896,20 @@ export default {
               : [{ name: '', setting: '' }];
             this.plotRequirement = parameters.plotRequirement || '';
             
+            // 根据配置设置默认激活的选项卡
+            if (this.reasoningDisplay === 'combined') {
+              this.activeTab = 'combined';
+            } else if (this.reasoningDisplay === 'hide') {
+              this.activeTab = 'final';
+            }
+            
             console.log('参数已从本地存储加载');
+            
+            // 加载参数后调整textarea高度
+            this.$nextTick(() => {
+              this.initTextareaHeights();
+            });
+            
             return true;
           } else {
             console.warn('参数版本不兼容，使用默认参数');
@@ -552,12 +930,26 @@ export default {
       
       this.isGenerating = true;
       this.currentContent = null;
+      this.currentReasoning = '';
       this.displayedContent = '';
+      this.displayedReasoning = '';
       this.currentStats = {
         characterCount: 0,
         chineseCount: 0
       };
+      this.reasoningStats = {
+        length: 0
+      };
       this.isEditing = false;
+      
+      // 根据显示方式设置初始选项卡
+      if (this.reasoningDisplay === 'combined') {
+        this.activeTab = 'combined';
+      } else if (this.reasoningDisplay === 'hide') {
+        this.activeTab = 'final';
+      } else {
+        this.activeTab = 'final';
+      }
       
       try {
         // 构建配置
@@ -575,25 +967,47 @@ export default {
           this.getHistoryContext()
         );
         
-        console.log('开始生成小说...', { systemConfig, userConfig });
+        console.log('开始生成小说...', { 
+          systemConfig, 
+          userConfig,
+          model: this.model,
+          enableReasoning: this.enableReasoning
+        });
         
         // 生成内容
         const stream = await generateContent({
           apiKey: this.apiKey,
           systemConfig,
-          userConfig
+          userConfig,
+          model: this.model,
+          enableReasoning: this.enableReasoning
         });
         
         // 处理流式响应
         const result = await processStream(stream, (update) => {
-          // 实时更新统计信息
+          // 更新统计信息
           this.currentStats = {
             characterCount: update.characterCount,
             chineseCount: update.chineseCount
           };
           
+          // 更新思维链统计
+          if (update.reasoningContent) {
+            this.reasoningStats.length = update.reasoningContent.length;
+          }
+          
           // 实时更新显示内容
           this.displayedContent = update.content;
+          
+          // 实时更新思维链内容
+          if (update.reasoningContent) {
+            this.displayedReasoning = update.reasoningContent;
+          }
+          
+          // 更新生成进度（基于内容长度）
+          if (update.characterCount > 0) {
+            this.generationProgress = Math.min(95, 10 + (update.characterCount / 2000) * 85);
+          }
           
           // 自动滚动到底部
           this.$nextTick(() => {
@@ -614,13 +1028,31 @@ export default {
               worldView: this.worldView,
               perspective: this.perspective,
               characters: this.characters,
-              plotRequirement: this.plotRequirement
+              plotRequirement: this.plotRequirement,
+              model: this.model,
+              enableReasoning: this.enableReasoning
             }
           };
           
+          // 保存思维链内容
+          if (result.reasoningContent) {
+            this.currentReasoning = result.reasoningContent;
+            
+            // 如果启用了合并显示，且用户选择了合并视图，创建合并内容
+            if (this.reasoningDisplay === 'combined') {
+              this.activeTab = 'combined';
+            }
+          }
+          
           // 确保显示最终内容
           this.displayedContent = result.finalContent;
+          this.displayedReasoning = result.reasoningContent || '';
+          
+          // 设置生成进度为完成
+          this.generationProgress = 100;
+          
           console.log('生成完成', this.currentContent);
+          console.log('思维链长度:', result.reasoningContent ? result.reasoningContent.length : 0);
         } else {
           throw new Error(result.error || '生成失败');
         }
@@ -635,7 +1067,7 @@ export default {
     
     // 滚动到底部
     scrollToBottom() {
-      const contentElement = this.$refs.contentText;
+      const contentElement = this.$refs.contentText || this.$refs.reasoningText;
       if (contentElement) {
         contentElement.scrollTop = contentElement.scrollHeight;
       }
@@ -659,6 +1091,11 @@ export default {
       this.currentContent.characterCount = this.currentContent.content.length;
       this.currentContent.chineseCount = countChineseCharacters(this.currentContent.content);
       
+      // 保存思维链内容
+      if (this.currentReasoning) {
+        this.currentContent.reasoningContent = this.currentReasoning;
+      }
+      
       this.history.push({ ...this.currentContent });
       this.saveHistory();
       alert('保存成功！');
@@ -667,11 +1104,22 @@ export default {
     // 清空当前预览内容
     clearCurrentContent() {
       this.currentContent = null;
+      this.currentReasoning = '';
       this.displayedContent = '';
+      this.displayedReasoning = '';
       this.isEditing = false;
+      // 根据当前显示方式重置选项卡
+      if (this.reasoningDisplay === 'combined') {
+        this.activeTab = 'combined';
+      } else {
+        this.activeTab = 'final';
+      }
       this.currentStats = {
         characterCount: 0,
         chineseCount: 0
+      };
+      this.reasoningStats = {
+        length: 0
       };
     },
     
@@ -679,28 +1127,50 @@ export default {
     viewContent(content) {
       this.currentContent = { ...content };
       this.displayedContent = content.content;
+      this.currentReasoning = content.reasoningContent || '';
       this.currentStats = {
         characterCount: content.characterCount,
         chineseCount: content.chineseCount
       };
       this.isEditing = false;
+      
+      // 根据当前显示方式决定显示哪个选项卡
+      if (this.reasoningDisplay === 'combined' && this.currentReasoning) {
+        this.activeTab = 'combined';
+      } else {
+        this.activeTab = 'final';
+      }
+    },
+    
+    // 查看思维链内容
+    viewReasoning(content) {
+      if (content.reasoningContent) {
+        this.currentContent = { ...content };
+        this.currentReasoning = content.reasoningContent;
+        this.displayedReasoning = content.reasoningContent;
+        this.isEditing = false;
+        this.activeTab = 'reasoning';
+      }
     },
     
     // 选择历史项
     selectHistoryItem(index) {
       this.selectedHistoryIndex = index;
-      this.viewContent(this.sortedHistory[index]);
+      const content = this.sortedHistory[index];
+      this.viewContent(content);
     },
     
     // 编辑历史项
     editHistoryItem(content, index) {
       this.currentContent = { ...content };
       this.displayedContent = content.content;
+      this.currentReasoning = content.reasoningContent || '';
       this.editingContent = content.content;
       this.originalContent = content.content;
       this.editingIndex = index;
       this.isEditing = true;
       this.selectedHistoryIndex = index;
+      this.activeTab = 'final';
     },
     
     // 切换编辑模式
@@ -719,6 +1189,7 @@ export default {
       this.originalContent = this.currentContent.content;
       this.isEditing = true;
       this.editingIndex = -1;
+      this.activeTab = 'final';
     },
     
     // 保存编辑内容
@@ -790,6 +1261,36 @@ export default {
       URL.revokeObjectURL(link.href);
     },
     
+    // 下载思维链
+    downloadReasoning() {
+      if (!this.currentReasoning) {
+        alert('没有可下载的思维链内容');
+        return;
+      }
+      
+      const blob = new Blob([this.currentReasoning], { type: 'text/plain;charset=utf-8' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `${this.currentChapterTitle}_思维链.txt`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    },
+    
+    // 仅下载思维链
+    downloadReasoningOnly(content) {
+      if (!content.reasoningContent) {
+        alert('该章节没有思维链内容');
+        return;
+      }
+      
+      const blob = new Blob([content.reasoningContent], { type: 'text/plain;charset=utf-8' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `${content.chapterTitle}_思维链.txt`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    },
+    
     // 下载所有章节
     downloadAllChapters() {
       if (this.history.length === 0) {
@@ -813,13 +1314,16 @@ export default {
     downloadAsJson() {
       const exportData = {
         format: 'novel-full-export',
-        version: '1.0',
+        version: '1.1', // 更新版本号
         exportedAt: new Date().toISOString(),
         generator: 'TaleMaker DS便捷小说生成器',
         
         // 包含当前参数
         parameters: {
           apiKey: '', // 出于安全考虑，不导出API密钥
+          model: this.model,
+          enableReasoning: this.enableReasoning,
+          reasoningDisplay: this.reasoningDisplay,
           worldView: this.worldView,
           perspective: this.perspective,
           additionalInfo: this.additionalInfo,
@@ -833,6 +1337,7 @@ export default {
         history: this.sortedHistory.map(item => ({
           chapterTitle: item.chapterTitle,
           content: item.content,
+          reasoningContent: item.reasoningContent || '', // 新增思维链内容
           characterCount: item.characterCount,
           chineseCount: item.chineseCount,
           timestamp: item.timestamp,
@@ -845,7 +1350,8 @@ export default {
         statistics: {
           totalChapters: this.history.length,
           totalCharacters: this.history.reduce((sum, item) => sum + item.characterCount, 0),
-          totalChineseCharacters: this.history.reduce((sum, item) => sum + item.chineseCount, 0)
+          totalChineseCharacters: this.history.reduce((sum, item) => sum + item.chineseCount, 0),
+          chaptersWithReasoning: this.history.filter(item => item.reasoningContent).length
         }
       };
       
@@ -872,11 +1378,19 @@ export default {
       let fullContent = `《小说全本》\n\n`;
       fullContent += `生成时间: ${new Date().toLocaleString()}\n`;
       fullContent += `总章节数: ${sortedChapters.length}\n`;
-      fullContent += `生成工具: TaleMaker DS便捷小说生成器\n\n`;
+      fullContent += `生成工具: TaleMaker DS便捷小说生成器\n`;
+      fullContent += `包含思维链的章节数: ${sortedChapters.filter(c => c.reasoningContent).length}\n\n`;
       fullContent += '='.repeat(50) + '\n\n';
       
       sortedChapters.forEach((chapter, index) => {
         fullContent += `${chapter.chapterTitle}\n\n`;
+        
+        // 如果章节有思维链，可以选择包含
+        if (chapter.reasoningContent && confirm(`章节"${chapter.chapterTitle}"有思维链内容，是否包含在导出文件中？`)) {
+          fullContent += `【模型思考过程】\n${chapter.reasoningContent}\n\n`;
+          fullContent += `【生成内容】\n`;
+        }
+        
         fullContent += chapter.content + '\n\n';
         fullContent += '='.repeat(50) + '\n\n';
         
@@ -887,6 +1401,9 @@ export default {
         }
         if (chapter.imported) {
           fullContent += ' | 已导入';
+        }
+        if (chapter.reasoningContent) {
+          fullContent += ' | 有思维链';
         }
         fullContent += ']\n\n';
       });
@@ -899,6 +1416,7 @@ export default {
       fullContent += `总章节数: ${sortedChapters.length}\n`;
       fullContent += `总字符数: ${totalChars}\n`;
       fullContent += `总中文字符: ${totalChinese}\n`;
+      fullContent += `包含思维链的章节数: ${sortedChapters.filter(c => c.reasoningContent).length}\n`;
       
       const blob = new Blob([fullContent], { type: 'text/plain;charset=utf-8' });
       const link = document.createElement('a');
@@ -983,6 +1501,9 @@ export default {
       
       // 恢复参数
       if (confirm('是否恢复保存的配置参数？')) {
+        this.model = data.parameters.model || 'deepseek-reasoner';
+        this.enableReasoning = data.parameters.enableReasoning !== undefined ? data.parameters.enableReasoning : true;
+        this.reasoningDisplay = data.parameters.reasoningDisplay || 'separate';
         this.worldView = data.parameters.worldView || '';
         this.perspective = data.parameters.perspective || '第三人称';
         this.additionalInfo = data.parameters.additionalInfo || '';
@@ -1004,6 +1525,7 @@ export default {
           // 确保必要字段存在
           isEdited: item.isEdited || false,
           imported: true,
+          reasoningContent: item.reasoningContent || '',
           timestamp: item.timestamp || new Date().toISOString()
         }));
         
@@ -1023,6 +1545,9 @@ export default {
     importLegacyFormat(data) {
       if (data.parameters) {
         // 导入参数
+        this.model = data.parameters.model || 'deepseek-reasoner';
+        this.enableReasoning = data.parameters.enableReasoning !== undefined ? data.parameters.enableReasoning : true;
+        this.reasoningDisplay = data.parameters.reasoningDisplay || 'separate';
         this.worldView = data.parameters.worldView || '';
         this.perspective = data.parameters.perspective || '第三人称';
         this.additionalInfo = data.parameters.additionalInfo || '';
@@ -1055,11 +1580,14 @@ export default {
         timestamp: new Date().toISOString(),
         isEdited: false,
         imported: true,
+        reasoningContent: '', // 纯文本导入没有思维链
         config: {
           worldView: this.worldView,
           perspective: this.perspective,
           characters: this.characters,
-          plotRequirement: this.plotRequirement
+          plotRequirement: this.plotRequirement,
+          model: this.model,
+          enableReasoning: this.enableReasoning
         }
       };
       
@@ -1096,7 +1624,8 @@ export default {
         this.history = history.map(item => ({
           ...item,
           isEdited: item.isEdited || false,
-          imported: item.imported || false
+          imported: item.imported || false,
+          reasoningContent: item.reasoningContent || '' // 新增思维链字段
         }));
       }
     }
@@ -1105,6 +1634,411 @@ export default {
 </script>
 
 <style scoped>
+/* 基础布局样式优化 */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  background-color: #f5f5f5;
+  overflow: hidden;
+  height: 100vh;
+  box-sizing: border-box;
+}
+
+.header {
+  margin-bottom: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2c3e50, #4a6572);
+  color: white;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  flex-shrink: 0;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.8rem;
+}
+
+.main-content {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* 模块样式优化 */
+.module {
+  background-color: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border: 1px solid #eaeaea;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.module h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #2c3e50;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 12px;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.module-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 12px;
+  flex-shrink: 0;
+  position: relative; /* 为悬浮提示定位 */
+}
+
+.module-header h2 {
+  margin-bottom: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.module-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* 隐藏滚动条但保留滚动功能 */
+.module-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.module-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.module-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.module-content:hover::-webkit-scrollbar-thumb {
+  opacity: 1;
+}
+
+/* Firefox 隐藏滚动条 */
+.module-content {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+}
+
+/* 悬浮生成状态指示器 */
+.floating-generating-indicator {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  z-index: 100;
+  min-width: 350px;
+  max-width: 400px;
+}
+
+.generating-progress {
+  background: white;
+  margin-top: 10px;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
+.progress-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e0e0e0;
+  border-top: 3px solid #3498db;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.progress-text {
+  flex: 1;
+}
+
+.generating-title {
+  margin: 0 0 5px 0;
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.generating-stats {
+  margin: 0 0 8px 0;
+  font-size: 12px;
+  color: #666;
+}
+
+.stat-value {
+  font-weight: bold;
+  color: #3498db;
+}
+
+/* 历史记录列表样式优化 */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-right: 5px;
+  overflow-y: auto;
+  max-height: none;
+}
+
+.history-item {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+  border-left: 4px solid #3498db;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 1px solid #e1e8ed;
+  overflow: visible;
+  position: relative;
+  flex-shrink: 0;
+}
+
+/* 移除历史项的横向滚动效果 */
+.history-item:hover {
+  background: #e9ecef;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.history-item.active {
+  border-left-color: #e74c3c;
+  background: #e3f2fd;
+  border-color: #3498db;
+}
+
+.history-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  overflow: visible;
+}
+
+.history-item-header h4 {
+  margin: 0;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-badges {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.preview-text {
+  color: #7f8c8d;
+  font-size: 14px;
+  margin-bottom: 8px;
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.meta-info {
+  font-size: 12px;
+  color: #95a5a6;
+  margin-bottom: 12px;
+  overflow: visible;
+}
+
+.history-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  overflow: visible;
+}
+
+/* 预览内容区域优化 */
+.preview-content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.content-display {
+  flex: 1;
+  margin-bottom: 20px;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-view, .reasoning-view, .combined-view {
+  flex: 1;
+  min-height: 200px;
+  max-height: 100%;
+  overflow-y: auto;
+  background: white;
+  border-radius: 6px;
+  padding: 15px;
+  border: 1px solid #eaeaea;
+  position: relative;
+}
+
+/* 隐藏内容区域的滚动条 */
+.content-view::-webkit-scrollbar,
+.reasoning-view::-webkit-scrollbar,
+.combined-view::-webkit-scrollbar {
+  width: 4px;
+}
+
+.content-view::-webkit-scrollbar-track,
+.reasoning-view::-webkit-scrollbar-track,
+.combined-view::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.content-view::-webkit-scrollbar-thumb,
+.reasoning-view::-webkit-scrollbar-thumb,
+.combined-view::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
+}
+
+/* 配置区域优化 */
+.config-section {
+  margin-bottom: 25px;
+  padding: 18px;
+  border-radius: 8px;
+  background: #f8fafc;
+  border-left: 4px solid #3498db;
+  overflow: visible;
+}
+
+.parameter-settings .module-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 内容选项卡样式优化 */
+.content-tabs {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #eaeaea;
+  padding-bottom: 10px;
+  flex-shrink: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.content-tabs::-webkit-scrollbar {
+  height: 3px;
+}
+
+.content-tabs::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.content-tabs::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 1.5px;
+}
+
+.tab-button {
+  padding: 8px 16px;
+  border: none;
+  background: #f5f5f5;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: #666;
+  transition: all 0.3s;
+  position: relative;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tab-button:hover:not(.disabled) {
+  background: #e9ecef;
+  color: #333;
+}
+
+.tab-button.active {
+  background: white;
+  color: #3498db;
+  border-bottom: 2px solid #3498db;
+  box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+}
+
+.tab-button.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tab-badge {
+  background: #e74c3c;
+  color: white;
+  border-radius: 10px;
+  padding: 2px 6px;
+  font-size: 10px;
+  margin-left: 5px;
+}
+
 /* 新增样式 */
 .get-key-btn {
   background: linear-gradient(135deg, #9b59b6, #8e44ad);
@@ -1121,6 +2055,86 @@ export default {
   display: flex;
   gap: 10px;
   margin-top: 15px;
+}
+
+/* 复选框样式 */
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.checkbox-input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.checkbox-label {
+  cursor: pointer;
+  user-select: none;
+  font-size: 14px;
+}
+
+.disabled-hint {
+  color: #7f8c8d;
+  font-size: 12px;
+  font-style: italic;
+}
+
+/* 内容视图样式 */
+.content-view, .reasoning-view, .combined-view {
+  min-height: 300px;
+  max-height: 500px;
+  overflow-y: auto;
+  background: white;
+  border-radius: 6px;
+  padding: 15px;
+  border: 1px solid #eaeaea;
+}
+
+.reasoning-view {
+  background: #f8f9fa;
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.reasoning-text {
+  color: #2c3e50;
+  font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.streaming-reasoning {
+  min-height: 200px;
+}
+
+/* 合并视图样式 */
+.combined-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.combined-section {
+  flex: 1;
+}
+
+.combined-section h4 {
+  margin-bottom: 10px;
+  color: #2c3e50;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 5px;
+  font-size: 16px;
+}
+
+.combined-divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, #3498db, transparent);
+  margin: 10px 0;
 }
 
 /* 导入状态指示器 */
@@ -1148,12 +2162,12 @@ export default {
   margin-bottom: 20px;
 }
 
-/* 历史记录中的导入标记 */
-.history-item.imported {
+/* 历史记录中的思维链标记 */
+.history-item.hasReasoning {
   border-left-color: #9b59b6;
 }
 
-.imported-badge {
+.reasoning-badge {
   background: #9b59b6;
   color: white;
   padding: 2px 8px;
@@ -1161,11 +2175,6 @@ export default {
   font-size: 12px;
   font-weight: 600;
   margin-left: 8px;
-}
-
-.item-badges {
-  display: flex;
-  gap: 5px;
 }
 
 /* 流式显示的特殊样式 */
@@ -1183,12 +2192,6 @@ export default {
 @keyframes blink {
   0%, 50% { opacity: 1; }
   51%, 100% { opacity: 0; }
-}
-
-/* 生成状态下的预览区域 */
-.preview-content.generating .content-text {
-  background: #f8f9fa;
-  border: 2px dashed #e9ecef;
 }
 
 /* 编辑模式样式 */
@@ -1224,6 +2227,7 @@ export default {
   line-height: 1.8;
   resize: vertical;
   background: white;
+  overflow-y: auto;
 }
 
 .content-textarea:focus {
@@ -1278,6 +2282,7 @@ export default {
   display: flex;
   gap: 10px;
   align-items: center;
+  position: relative;
 }
 
 .module-header {
@@ -1295,95 +2300,7 @@ export default {
   padding-bottom: 0;
 }
 
-/* 其他原有样式保持不变 */
-.app-container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-  background-color: #f5f5f5;
-}
-
-.header {
-  margin-bottom: 20px;
-  padding: 20px;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #2c3e50, #4a6572);
-  color: white;
-  text-align: center;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.header h1 {
-  margin: 0;
-  font-size: 1.8rem;
-}
-
-.main-content {
-  flex: 1;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
-}
-
-.module {
-  background-color: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  border: 1px solid #eaeaea;
-}
-
-.module h2 {
-  margin-top: 0;
-  margin-bottom: 20px;
-  color: #2c3e50;
-  border-bottom: 2px solid #3498db;
-  padding-bottom: 12px;
-  font-size: 1.4rem;
-}
-
-.module-content {
-  min-height: 200px;
-}
-
-/* 配置区域样式 */
-.config-section {
-  margin-bottom: 30px;
-  padding: 20px;
-  border-radius: 8px;
-  background: #f8fafc;
-  border-left: 4px solid #3498db;
-}
-
-.config-section:last-child {
-  margin-bottom: 0;
-}
-
-.config-section h3 {
-  color: #2c3e50;
-  margin-bottom: 20px;
-  font-size: 1.1rem;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.api-config {
-  border-left-color: #e74c3c;
-  background: #fef5f5;
-}
-
-.basic-config {
-  border-left-color: #f39c12;
-  background: #fef9f3;
-}
-
-.chapter-config {
-  border-left-color: #27ae60;
-  background: #f3fcf7;
-}
-
+/* 其他原有样式 */
 .input-group {
   margin-bottom: 18px;
 }
@@ -1419,18 +2336,53 @@ label {
   box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
-.textarea-field {
-  resize: vertical;
+.textarea-field.auto-resize {
+  resize: none;
+  overflow-y: hidden;
   min-height: 60px;
   line-height: 1.5;
+  transition: height 0.2s ease;
+}
+
+.textarea-field.small.auto-resize {
+  min-height: 60px;
+  max-height: 200px;
+}
+
+.content-textarea.auto-resize {
+  min-height: 400px;
+  max-height: 800px;
+}
+
+/* 自定义滚动条样式 */
+.textarea-field.auto-resize::-webkit-scrollbar,
+.content-textarea.auto-resize::-webkit-scrollbar {
+  width: 6px;
+}
+
+.textarea-field.auto-resize::-webkit-scrollbar-track,
+.content-textarea.auto-resize::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.textarea-field.auto-resize::-webkit-scrollbar-thumb,
+.content-textarea.auto-resize::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.textarea-field.auto-resize::-webkit-scrollbar-thumb:hover,
+.content-textarea.auto-resize::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
 }
 
 .input-field.small, .textarea-field.small {
   font-size: 13px;
-  margin: 5px;
+  margin-bottom: 15px;
 }
 
-.input-field.small{
+.input-field.small {
   width: 50%;
 }
 
@@ -1523,12 +2475,6 @@ label {
   min-width: 140px;
 }
 
-/* 生成指示器样式 */
-.generating-indicator {
-  text-align: center;
-  padding: 40px 20px;
-}
-
 .spinner {
   border: 3px solid #f3f3f3;
   border-top: 3px solid #3498db;
@@ -1539,20 +2485,9 @@ label {
   margin: 0 auto 20px;
 }
 
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
 .stats {
   color: #7f8c8d;
   font-size: 14px;
-}
-
-.preview-content {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
 }
 
 .content-display {
@@ -1583,59 +2518,6 @@ label {
   justify-content: center;
 }
 
-/* 历史记录样式 */
-.history-list {
-  max-height: 600px;
-  overflow-y: auto;
-}
-
-.history-item {
-  background: #f8f9fa;
-  padding: 16px;
-  margin-bottom: 12px;
-  border-radius: 8px;
-  border-left: 4px solid #3498db;
-  cursor: pointer;
-  transition: all 0.3s;
-  border: 1px solid #e1e8ed;
-}
-
-.history-item:hover {
-  background: #e9ecef;
-  transform: translateX(4px);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.history-item.active {
-  border-left-color: #e74c3c;
-  background: #e3f2fd;
-  border-color: #3498db;
-}
-
-.history-item h4 {
-  margin: 0 0 8px 0;
-  color: #2c3e50;
-  font-size: 15px;
-}
-
-.preview-text {
-  color: #7f8c8d;
-  font-size: 14px;
-  margin-bottom: 8px;
-  line-height: 1.4;
-}
-
-.meta-info {
-  font-size: 12px;
-  color: #95a5a6;
-  margin-bottom: 12px;
-}
-
-.history-actions {
-  display: flex;
-  gap: 8px;
-}
-
 .placeholder {
   display: flex;
   flex-direction: column;
@@ -1662,6 +2544,18 @@ label {
   .parameter-settings {
     grid-column: 1 / 3;
   }
+  
+  .parameter-settings .module-content {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  
+  .parameter-settings .config-section {
+    margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
+  }
 }
 
 @media (min-width: 1024px) {
@@ -1672,9 +2566,39 @@ label {
   .parameter-settings {
     grid-column: auto;
   }
+  
+  .parameter-settings .module-content {
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: none;
+  }
 }
 
 @media (max-width: 767px) {
+  .main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .module {
+    min-height: 300px;
+  }
+  
+  .history-list {
+    max-height: 400px;
+  }
+  
+  .floating-generating-indicator {
+    position: fixed;
+    top: auto;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    min-width: 90%;
+    max-width: 90%;
+  }
+  
   .input-row {
     grid-template-columns: 1fr;
   }
@@ -1720,5 +2644,74 @@ label {
   .parameter-actions {
     flex-direction: column;
   }
+  
+  .content-tabs {
+    flex-wrap: wrap;
+  }
+  
+  .tab-button {
+    flex: 1;
+    min-width: 80px;
+    text-align: center;
+  }
+  
+  .combined-content {
+    flex-direction: column;
+  }
+}
+
+/* Firefox隐藏滚动条的额外处理 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+}
+
+/* 确保所有滚动区域都有统一的行为 */
+.scrollable-area {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollable-area::-webkit-scrollbar {
+  display: none;
+}
+
+/* 确保内容文本可读且滚动 */
+.content-text, .reasoning-text {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  line-height: 1.8;
+  font-family: 'Georgia', serif;
+  height: 100%;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+/* 导入状态指示器样式 */
+.importing-indicator .spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+.importing-indicator p {
+  color: #2c3e50;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* 修复输入组样式 */
+.input-group {
+  margin-bottom: 20px;
+}
+
+.input-group:last-child {
+  margin-bottom: 0;
 }
 </style>
