@@ -1,6 +1,5 @@
 import OpenAI from "openai";
 
-// 统计中文字符数量
 export function countChineseCharacters(str) {
     if (!str) return 0;
     const regex = /[\u4E00-\u9FFF\u3400-\u4DBF\uF900-\uFAFF\u20000-\u2A6DF]/gu;
@@ -8,7 +7,6 @@ export function countChineseCharacters(str) {
     return matches ? matches.length : 0;
 }
 
-// 创建OpenAI客户端实例
 function createOpenAIClient(apiKey) {
     return new OpenAI({
         baseURL: 'https://api.deepseek.com/v3.2_speciale_expires_on_20251215',
@@ -17,7 +15,6 @@ function createOpenAIClient(apiKey) {
     });
 }
 
-// 构建系统配置
 export function buildSystemConfig(worldView, perspective, additionalInfo) {
     const config = {
         "设定": "你是一个专业的小说创作助手，请根据用户要求生成高质量的小说章节内容。",
@@ -39,20 +36,17 @@ export function buildSystemConfig(worldView, perspective, additionalInfo) {
     return config;
 }
 
-// 构建用户配置
 export function buildUserConfig(chapterNumber, chapterName, plotRequirement, characters, history = "") {
     const config = {
         "章节信息": `第${chapterNumber}章${chapterName ? `：${chapterName}` : ''}`,
         "情节要求": plotRequirement || "请根据世界观设定自然发展情节"
     };
 
-    // 添加角色信息
     const validCharacters = characters.filter(char => char.name && char.setting);
     if (validCharacters.length > 0) {
         config["登场角色"] = validCharacters;
     }
 
-    // 添加上下文信息
     if (history && history.trim()) {
         config["历史上下文"] = history;
     }
@@ -60,7 +54,6 @@ export function buildUserConfig(chapterNumber, chapterName, plotRequirement, cha
     return config;
 }
 
-// 构建完整的提示词
 function buildMessages(systemConfig, userConfig) {
     const systemMessage = {
         role: "system",
@@ -95,37 +88,25 @@ function buildMessages(systemConfig, userConfig) {
     return [systemMessage, userMessage];
 }
 
-// 主功能函数 - 生成内容
 export async function generateContent(params) {
     try {
         const {
             apiKey,
             systemConfig = {},
             userConfig = {},
-            model = "deepseek-reasoner", // 默认使用deepseek-reasoner模型
+            model = "deepseek-reasoner",
             maxTokens = 64000,
             temperature = 0.7,
-            enableReasoning = true // 新增：是否启用思维链
+            enableReasoning = true
         } = params;
 
-        // 验证必要参数
         if (!apiKey) {
             throw new Error("API密钥不能为空");
         }
 
-        // 创建OpenAI客户端
         const openai = createOpenAIClient(apiKey);
-
-        // 构建消息
         const messages = buildMessages(systemConfig, userConfig);
 
-        console.log("发送请求到DeepSeek API...");
-        console.log("系统消息:", messages[0].content);
-        console.log("用户消息:", messages[1].content);
-        console.log("启用思维链:", enableReasoning);
-        console.log("使用模型:", model);
-
-        // 根据是否启用思维链设置请求参数
         const requestConfig = {
             messages: messages,
             model: model,
@@ -133,27 +114,18 @@ export async function generateContent(params) {
             stream: true,
         };
 
-        // 如果启用了思维链，添加thinking参数
         if (enableReasoning && model === "deepseek-reasoner") {
             requestConfig.extra_body = {
                 thinking: { type: "enabled" }
             };
-            console.log("已启用思维链模式");
-        } else if (enableReasoning && model !== "deepseek-reasoner") {
-            console.warn("只有deepseek-reasoner模型支持思维链，已禁用思维链");
         } else {
-            // 如果没有启用思维链，添加temperature参数
             requestConfig.temperature = temperature;
         }
 
         const stream = await openai.chat.completions.create(requestConfig);
-
-        console.log("API请求成功，开始流式传输...");
         return stream;
         
     } catch (error) {
-        console.error("API调用失败:", error);
-        
         let errorMessage = "生成失败: ";
         if (error.message.includes("401")) {
             errorMessage += "API密钥无效或已过期";
@@ -163,8 +135,6 @@ export async function generateContent(params) {
             errorMessage += "服务器内部错误，请稍后再试";
         } else if (error.message.includes("network")) {
             errorMessage += "网络连接错误，请检查网络设置";
-        } else if (error.message.includes("thinking")) {
-            errorMessage += "思维链参数设置错误，请检查模型是否支持";
         } else {
             errorMessage += error.message;
         }
@@ -173,26 +143,22 @@ export async function generateContent(params) {
     }
 }
 
-// 处理流式响应 - 支持思维链的版本
 export async function processStream(stream, onContentUpdate) {
     let fullContent = "";
-    let reasoningContent = ""; // 新增：存储思维链内容
+    let reasoningContent = "";
     let chineseCount = 0;
     let characterCount = 0;
     let startTime = Date.now();
-    let lastUpdateTime = startTime;
 
     try {
         for await (const chunk of stream) {
             const delta = chunk.choices[0]?.delta || {};
             const content = delta.content || "";
-            const reasoning = delta.reasoning_content || ""; // 获取思维链内容
+            const reasoning = delta.reasoning_content || "";
             
-            // 处理思维链内容
             if (reasoning) {
                 reasoningContent += reasoning;
                 
-                // 传递思维链内容给回调函数
                 if (onContentUpdate) {
                     onContentUpdate({
                         content: fullContent,
@@ -205,15 +171,11 @@ export async function processStream(stream, onContentUpdate) {
                 }
             }
             
-            // 处理最终内容
             if (content) {
                 fullContent += content;
                 characterCount = fullContent.length;
                 chineseCount = countChineseCharacters(fullContent);
                 
-                const currentTime = Date.now();
-                
-                // 实时回调更新内容
                 if (onContentUpdate) {
                     onContentUpdate({
                         content: fullContent,
@@ -224,23 +186,13 @@ export async function processStream(stream, onContentUpdate) {
                         incrementalReasoning: reasoning || ""
                     });
                 }
-                
-                lastUpdateTime = currentTime;
             }
             
-            // 检查是否完成
             if (chunk.choices[0]?.finish_reason) {
-                const endTime = Date.now();
-                const duration = (endTime - startTime) / 1000;
-                console.log(`生成完成, 原因: ${chunk.choices[0].finish_reason}`);
-                console.log(`总耗时: ${duration.toFixed(2)}秒`);
-                console.log(`总字符数: ${characterCount}, 中文字符: ${chineseCount}`);
-                console.log(`思维链长度: ${reasoningContent.length}字符`);
                 break;
             }
         }
 
-        // 最终后处理
         const processedContent = postProcessContent(fullContent);
         
         return {
@@ -253,7 +205,6 @@ export async function processStream(stream, onContentUpdate) {
         };
         
     } catch (error) {
-        console.error("流处理错误:", error);
         return {
             finalContent: fullContent,
             reasoningContent: reasoningContent,
@@ -265,7 +216,6 @@ export async function processStream(stream, onContentUpdate) {
     }
 }
 
-// 处理非流式响应 - 支持思维链的版本
 export async function processNonStreamResponse(stream, onContentUpdate) {
     try {
         let fullResponse = "";
@@ -274,7 +224,6 @@ export async function processNonStreamResponse(stream, onContentUpdate) {
             fullResponse += JSON.stringify(chunk) + "\n";
         }
         
-        // 解析完整的响应
         const lines = fullResponse.split("\n").filter(line => line.trim());
         let response = null;
         
@@ -291,11 +240,8 @@ export async function processNonStreamResponse(stream, onContentUpdate) {
             throw new Error("无法解析API响应");
         }
         
-        // 获取思维链内容和最终内容
         const reasoningContent = response.choices?.[0]?.message?.reasoning_content || "";
         const finalContent = response.choices?.[0]?.message?.content || "";
-        
-        // 处理最终内容
         const processedContent = postProcessContent(finalContent);
         const chineseCount = countChineseCharacters(processedContent);
         
@@ -318,7 +264,6 @@ export async function processNonStreamResponse(stream, onContentUpdate) {
         };
         
     } catch (error) {
-        console.error("处理非流式响应错误:", error);
         return {
             finalContent: "",
             reasoningContent: "",
@@ -330,13 +275,11 @@ export async function processNonStreamResponse(stream, onContentUpdate) {
     }
 }
 
-// 内容后处理
 function postProcessContent(content) {
     if (!content) return "";
     
     let processed = content.trim();
     
-    // 清理常见的AI附加文本
     const unwantedSuffixes = [
         "\n\n以上就是本章的内容。",
         "\n\n本章到此结束。",
@@ -355,19 +298,16 @@ function postProcessContent(content) {
         }
     });
     
-    // 清理多余的换行
     processed = processed.replace(/\n{3,}/g, '\n\n');
     
     return processed;
 }
 
-// 思维链内容后处理
 export function postProcessReasoning(content) {
     if (!content) return "";
     
     let processed = content.trim();
     
-    // 清理思维链中的多余标记
     const reasoningMarkers = [
         "思考过程：",
         "思考：",
@@ -379,20 +319,17 @@ export function postProcessReasoning(content) {
         "最后，"
     ];
     
-    // 只保留实际的思考内容
     reasoningMarkers.forEach(marker => {
         if (processed.startsWith(marker)) {
             processed = processed.slice(marker.length).trim();
         }
     });
     
-    // 清理多余的换行
     processed = processed.replace(/\n{3,}/g, '\n\n');
     
     return processed;
 }
 
-// 验证配置
 export function validateConfig(apiKey, worldView, perspective, chapterNumber) {
     const errors = [];
 
@@ -418,13 +355,11 @@ export function validateConfig(apiKey, worldView, perspective, chapterNumber) {
     };
 }
 
-// 新增：格式化和显示思维链内容的工具函数
 export function formatReasoningContent(reasoningContent, includeMarkdown = true) {
     if (!reasoningContent) return "";
     
     let formatted = reasoningContent;
     
-    // 如果启用Markdown格式，添加代码块
     if (includeMarkdown) {
         formatted = `## 模型思考过程\n\n\`\`\`\n${reasoningContent}\n\`\`\``;
     }
@@ -432,7 +367,6 @@ export function formatReasoningContent(reasoningContent, includeMarkdown = true)
     return formatted;
 }
 
-// 新增：合并思维链和最终内容的函数
 export function combineReasoningAndContent(reasoningContent, finalContent, options = {}) {
     const {
         showReasoning = true,
@@ -448,12 +382,10 @@ export function combineReasoningAndContent(reasoningContent, finalContent, optio
     return `## ${reasoningTitle}\n\n${reasoningContent}${separator}## ${contentTitle}\n\n${finalContent}`;
 }
 
-// 新增：生成章节标题
 export function generateChapterTitle(chapterNumber, chapterName = "") {
     return `第${chapterNumber}章${chapterName ? `：${chapterName}` : ''}`;
 }
 
-// 新增：获取文本统计信息
 export function getTextStatistics(text) {
     if (!text) {
         return {
@@ -477,7 +409,6 @@ export function getTextStatistics(text) {
     };
 }
 
-// 新增：创建章节数据结构
 export function createChapterData(chapterTitle, content, reasoningContent = "", config = {}) {
     const stats = getTextStatistics(content);
     
@@ -503,7 +434,6 @@ export function createChapterData(chapterTitle, content, reasoningContent = "", 
     };
 }
 
-// 新增：导出章节为多种格式
 export function exportChapter(chapterData, format = 'txt') {
     if (!chapterData) return null;
     
@@ -556,7 +486,6 @@ export function exportChapter(chapterData, format = 'txt') {
     };
 }
 
-// 新增：批量导出多个章节
 export function exportMultipleChapters(chapters, format = 'txt', includeReasoning = false) {
     if (!chapters || chapters.length === 0) return null;
     
@@ -572,7 +501,6 @@ export function exportMultipleChapters(chapters, format = 'txt', includeReasonin
                 generator: 'TaleMaker DS便捷小说生成器',
                 chapters: chapters.map(chapter => ({
                     ...chapter,
-                    // 清理大对象，只保留必要数据
                     config: chapter.config || {}
                 })),
                 statistics: {
@@ -597,7 +525,6 @@ export function exportMultipleChapters(chapters, format = 'txt', includeReasonin
                 return chapterContent + '\n\n' + '='.repeat(50) + '\n\n';
             }).join('\n');
             
-            // 添加统计信息
             const totalChars = chapters.reduce((sum, ch) => sum + ch.characterCount, 0);
             const totalChinese = chapters.reduce((sum, ch) => sum + ch.chineseCount, 0);
             
@@ -647,13 +574,10 @@ export function exportMultipleChapters(chapters, format = 'txt', includeReasonin
     };
 }
 
-// 新增：导入章节数据
 export function importChapters(importData) {
     try {
-        // 尝试解析为JSON
         const data = JSON.parse(importData);
         
-        // 检查是否是全本导出格式
         if (data.format === 'novel-full-export') {
             return {
                 type: 'full-export',
@@ -664,7 +588,6 @@ export function importChapters(importData) {
             };
         }
         
-        // 检查是否是单个章节
         if (data.chapterTitle && data.content) {
             return {
                 type: 'single-chapter',
@@ -672,14 +595,12 @@ export function importChapters(importData) {
             };
         }
         
-        // 其他格式的JSON数据
         return {
             type: 'unknown-json',
             data: data
         };
         
     } catch (error) {
-        // 如果不是JSON，作为纯文本处理
         return {
             type: 'plain-text',
             content: importData
@@ -687,7 +608,6 @@ export function importChapters(importData) {
     }
 }
 
-// 新增：生成模型配置说明
 export function generateModelConfigHelp() {
     return {
         models: [
