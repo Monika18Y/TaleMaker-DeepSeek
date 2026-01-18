@@ -1,11 +1,22 @@
 <template>
   <div class="app-container">
     <header class="header">
-      <h1>TaleMaker  DeepSeek 小说生成框架</h1>
+      <h1>CJY专属  DeepSeek 小说生成框架</h1>
     </header>
+    <nav class="navigation-tabs">
+      <button @click="activeTab = 'parameters'" :class="{ active: activeTab === 'parameters' }" class="tab-btn">
+        参数设置
+      </button>
+      <button @click="activeTab = 'preview'" :class="{ active: activeTab === 'preview' }" class="tab-btn">
+        生成预览
+      </button>
+      <button @click="activeTab = 'history'" :class="{ active: activeTab === 'history' }" class="tab-btn">
+        已生成内容
+      </button>
+    </nav>
 
     <main class="main-content">
-      <section class="module parameter-settings">
+      <section class="module parameter-settings" :class="{ hidden: activeTab !== 'parameters' }">
         <h2>参数设置</h2>
         <div class="module-content">
           <div class="config-section api-config">
@@ -128,7 +139,7 @@
         </div>
       </section>
 
-      <section class="module preview">
+      <section class="module preview" :class="{ hidden: activeTab !== 'preview' }">
         <div class="module-header">
           <h2>生成预览</h2>
           <div class="header-actions">
@@ -284,7 +295,7 @@
         </div>
       </section>
 
-      <section class="module history">
+      <section class="module history" :class="{ hidden: activeTab !== 'history' }">
         <div class="module-header">
           <h2>已生成内容</h2>
           <div class="header-actions">
@@ -385,7 +396,7 @@ export default {
       currentReasoning: '',
       displayedContent: '',
       displayedReasoning: '',
-      activeTab: 'final',
+      activeTab: 'parameters',
       currentStats: {
         characterCount: 0,
         chineseCount: 0
@@ -1346,19 +1357,19 @@ export default {
 
 <style scoped>
 .app-container {
-  min-height: 100vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   padding: 10px;
   background-color: #f5f5f5;
-  overflow: auto;
+  overflow: hidden;
   box-sizing: border-box;
   width: 100%;
   min-width: 320px;
 }
 
 .header {
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   padding: 15px 20px;
   border-radius: 10px;
   background: linear-gradient(135deg, #2c3e50, #4a6572);
@@ -1366,6 +1377,42 @@ export default {
   text-align: center;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   flex-shrink: 0;
+}
+
+.navigation-tabs {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 15px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f8f9fa;
+  border: 1px solid #eaeaea;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px 10px;
+  border: none;
+  background: transparent;
+  color: #2c3e50;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
+  box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tab-btn:hover {
+  background: rgba(52, 152, 219, 0.1);
 }
 
 .header h1 {
@@ -1376,14 +1423,43 @@ export default {
 
 .main-content {
   flex: 1;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
+  display: flex;
+  gap: 10px;
   width: 100%;
   min-height: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 10px;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
 }
 
 .module {
+  scroll-snap-align: start;
+}
+
+.main-content::-webkit-scrollbar {
+  height: 6px;
+}
+
+.main-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.main-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.module {
+  flex: 0 0 100%;
+  min-width: 300px;
+  max-width: 100%;
   background-color: white;
   border-radius: 12px;
   padding: 15px;
@@ -1392,10 +1468,13 @@ export default {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  min-height: 300px;
-  max-height: none;
-  width: 100%;
+  min-height: 500px;
   box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+.module.hidden {
+  display: none;
 }
 
 .module h2 {
@@ -2355,15 +2434,110 @@ label {
 
   .main-content {
     display: flex;
-    flex-direction: column;
-    gap: 15px;
+    gap: 10px;
     width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
   }
 
   .module {
-    min-height: 250px;
+    flex: 0 0 100%;
+    min-width: calc(100% - 10px);
+    min-height: 500px;
     padding: 12px;
     margin-bottom: 0;
+  }
+  
+  /* 优化参数设置板块的空间利用 */
+  .parameter-settings .module-content {
+    gap: 10px;
+  }
+  
+  .config-section {
+    margin-bottom: 0;
+    padding: 12px;
+    gap: 10px;
+    border-left: none;
+    border-top: 4px solid #3498db;
+  }
+  
+  .config-section h3 {
+    margin-bottom: 10px;
+    font-size: 1rem;
+  }
+  
+  .input-group {
+    margin-bottom: 12px;
+  }
+  
+  .input-group:last-child {
+    margin-bottom: 0;
+  }
+  
+  /* 优化角色配置区域的空间 */
+  .character-juese {
+    padding: 8px;
+    gap: 8px;
+  }
+  
+  .character-juese .input-field.small {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  /* 优化API密钥区域的按钮布局 */
+  .input-with-button {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  
+  .input-with-button .input-field {
+    grid-column: 1 / -1;
+  }
+  
+  /* 优化参数操作按钮区域 */
+  .parameter-actions {
+    gap: 8px;
+  }
+  
+  .parameter-actions button {
+    flex: 1;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+  
+  /* 优化移动端textarea的高度 */
+  .textarea-field.auto-resize {
+    min-height: 50px;
+    max-height: 200px;
+  }
+  
+  .textarea-field.small.auto-resize {
+    min-height: 40px;
+    max-height: 120px;
+  }
+  
+  /* 优化世界观和情节要求等textarea的默认高度 */
+  #worldView,
+  #additionalInfo,
+  #plotRequirement {
+    min-height: 60px;
+    max-height: 150px;
+  }
+  
+  /* 优化label的字体大小和间距 */
+  label {
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  
+  /* 优化输入框的内边距 */
+  .input-field,
+  .select-field,
+  .textarea-field {
+    padding: 8px 10px;
+    font-size: 13px;
   }
 
   .module-header {
@@ -2386,6 +2560,7 @@ label {
   .input-row {
     grid-template-columns: 1fr;
     gap: 12px;
+    margin-bottom: 8px;
   }
 
   .character-juese {

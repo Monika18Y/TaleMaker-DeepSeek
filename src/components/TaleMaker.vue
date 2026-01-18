@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <header class="header">
-      <h1>TaleMaker  DeepSeek 小说生成框架</h1>
+      <h1>CJY专属  DeepSeek 小说生成框架</h1>
     </header>
 
     <main class="main-content">
